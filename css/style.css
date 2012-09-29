@@ -1,0 +1,138 @@
+/* 
+    Document   : style
+    Created on : Sep 21, 2012, 1:14:09 PM
+    Author     : ryan
+*/
+
+/* 全局 */
+a {
+    text-decoration: none;
+}
+input {
+    font-size: large;
+}
+input[type=text],textarea,input[type=email] {
+    border: 1px solid #333;
+    padding: 5px;
+}
+input[type=submit], button {
+    border: 0px solid;
+    padding: 5px 15px;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+}
+.btn {
+    cursor: pointer;
+}
+
+/* 头部 */
+.header {
+    background: #000;
+    padding: 10px 10px;
+}
+.header a {
+    color: #fff;
+}
+.header .account {
+    float: right;
+}
+.header .account a{
+    opacity: 0.8;
+    font-size: small;
+    background-repeat: no-repeat;
+    margin-left: 10px;
+}
+.header .account a.name {
+    padding-left: 20px;
+}
+.header .account a:hover {
+    opacity: 1;
+}
+.header h1 {
+    font-size: xx-large;
+    color: #fff;
+    text-align: center;
+}
+.header h1 a {
+    display: block;
+}
+.header span {
+    color: white;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* 翻页控件 */
+.paging {
+    width: 604px;
+    margin: auto;
+    border-top: 1px solid #333;
+    font-size: small;
+    margin-top: 20px;
+}
+.paging ol {
+    float: left;
+    width: 520px;
+    margin-bottom: 10px;
+}
+.paging ol:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.paging ol li {
+    float: left;
+    text-align: center;
+}
+.paging ol li.on {
+    
+}
+.paging ol li.on a {
+    color: #fff;
+    background: #333;
+    font-weight: bold;
+}
+.paging ol li a {
+    color: #333;
+    line-height: 2em;
+    display: inline-block;
+    width: 3em;
+}
+.paging .next-page.btn {
+    float: right;
+    height: 2em;
+    line-height: 2em;
+    display: inline-block;
+    width: 4em;
+    text-align: center;
+    color: #333;
+}
+
+/* 脚部 */
+.footer {
+    clear: both;
+    padding: 6px;
+    text-align: center;
+    color: #666;
+    line-height: 2em;
+    font-size: x-small;
+    margin-bottom: 10px;
+}
+.footer a {
+    padding: 0 3px;
+    color: #666;
+    font-weight: bold;
+}
+.footer a:hover {
+    color: #333;
+}
+
+/* 404 页面 */
+.misssing {
+    text-align: center;
+    margin-top: 100px;
+    font-size: large;
+    font-weight: bold;
+}
