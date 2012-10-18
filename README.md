@@ -54,17 +54,18 @@ function h($str) {
 
 都在文件夹 lib 下。
 
-- Pdb
+- **Pdb**
 
  数据库类
 
-- Paginate
+- **Paginate**
 
  翻页类
 
-- QqLogin
+- **QqLogin**
 
  QQ 平台登录
 
-- SiteMap
+- **SiteMap**
+
  生成 Google 的 SiteMap （还不完善）。
