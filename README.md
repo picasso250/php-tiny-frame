@@ -16,14 +16,16 @@ Very small framework for website write in PHP.
 
 所以，登录页面的地址看起来就是这样的 `/index.php?c=login`
 
+使用面向对象和面向过程的双重思想（会不会人格分裂？）在 M 部分使用 OO，在 C 的部分使用面向过程的思想。
+
 文件结构
 -------
 
-M: model
+**M**: model
 
-V: view
+**V**: view
 
-C: controller
+**C**: controller
 
 MVC 都使用 PHP 文件，其中 model 是类。
 
