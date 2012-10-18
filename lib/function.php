@@ -7,10 +7,13 @@
  * @version 7.4 
  */
 
+// 防止未定义错误
 function i(&$param, $or='') {
     return isset($param)? $param : $or;
 }
 
+// 防止写那么长的函数名
+// 任何来自用户的输入要显示在页面上都要经过这个函数过滤
 function h($str) {
     return htmlspecialchars($str);
 }
