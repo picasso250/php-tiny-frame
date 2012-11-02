@@ -18,8 +18,33 @@ Very small framework for website write in PHP.
 
 使用面向对象和面向过程的双重思想（会不会人格分裂？）在 M 部分使用 OO，在 C 的部分使用面向过程的思想。
 
-文件结构
+M 和 OO
 -------
+
+Model 层是用 OO 的思想写的，我尽力让它被调用的方式更加优雅。
+
+比如传值
+
+```php
+$admin->delProduct($arg); // 应该传什么进去？
+```
+
+没问题，但一般来说，从前端传过来的是 id，那么我们可不可以这样呢？
+
+```php
+$admin->delProduct($id); // 一个字符串
+```
+
+如果这个可以，那么我们想要批量删除的时候：
+
+```php
+$admin->delProduct($arr_of_ids); // 一个数组
+```
+
+那么这三种调用方式应该都是可以的。
+
+文件结构
+--------
 
 **M**: model
 
