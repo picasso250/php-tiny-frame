@@ -12,11 +12,11 @@ Very small framework for website write in PHP.
 
 初衷就是写一个自己用的顺手，又很轻型的 PHP 框架。
 
-所有的请求都是给 index.php 的，用 GET 参数 c 指定 controller。如果想要伪静态化，请使用 .htaccess 或者 config.yaml（已经有实例代码）。
-
-所以，登录页面的地址看起来就是这样的 `/index.php?c=login`
+所有的请求都是给 index.php 的，由 PHP 实现 router。
 
 使用面向对象和面向过程的双重思想（会不会人格分裂？）在 M 部分使用 OO，在 C 的部分使用面向过程的思想。
+
+这个框架参考了 鸡爷 的自用框架，也参考了 lazyPHP。在此一并表示感谢。
 
 M 和 OO
 -------
@@ -52,32 +52,27 @@ $admin->delProduct($arr_of_ids); // 一个数组
 
 **C**: controller
 
-MVC 都使用 PHP 文件，其中 model 是类。
+model 是类。
 
-所有的 Model 都可以继承了一个我已经写好的 Model 类，里面有一个基本的构造函数。
+所有的 Model 都可以继承了一个我已经写好的 BasicModel 类，里面有一些基本的增删改查的函数。
 
 常用函数
 --------
 
-/lib/function.php 中是一些常用函数：
+/app_core/function.php 中有一些常用函数：
 
 ```php
-// 防止未定义错误
-function i(&$param, $or='') {
-    return isset($param)? $param : $or;
-}
+function _get($name);
 
-// 防止写那么长的函数名
-// 任何来自用户的输入要显示在页面上都要经过这个函数过滤
-function h($str) {
-    return htmlspecialchars($str);
-}
+function _post($name);
+
+function _req($name);
 ```
 
 类库
 -----
 
-都在文件夹 lib 下。
+都在文件夹 `/app_core/class` 下。
 
 - **Pdb**
 
