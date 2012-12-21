@@ -1,7 +1,6 @@
 <?php
 /**
  * @author  ryan <cumt.xiaochi@gmail.com>
- * @version 7.6 add _req() function group
  */
 
 /* $_GET, $_POST, $_REQUEST helpers or shortens */
@@ -249,6 +248,18 @@ function file_ext($file_name) {
     }
     return end($arr);
 }
+
+// (CamelCase or camelCase) to under_score
+// support only one Upper Case
+// this function is very important, move it to core!
+function camel2under($str)
+{
+    if (preg_match('/.+[A-Z].+/', $str)) {
+        $str = preg_replace('/^(.+)([A-Z].+)$/', '$1_$2', $str); // with underscore
+    }
+    return strtolower($str);
+}
+
 
 // usage: 
 //     $url could be empty, which will go to index, 

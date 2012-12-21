@@ -18,6 +18,8 @@ class BasicModel
             $this->info = $para;
         } elseif (is_numeric($para)) {
             $this->id = $para;
+        } elseif (is_a($para, get_called_class())) { // clone
+            $this->id = $para->id;
         } else {
             d($para);
             throw new Exception("not good arg for construct");
@@ -48,7 +50,7 @@ class BasicModel
         $self = get_called_class();
         $arr = $self::buildDbArgs($conds);
         if (count($arr) != 4) {
-            throw new Exception("not 4", 1);
+            throw new Exception("build db arg, not 4", 1);
         }
         list($tables, $conds, $orderby, $tail) = $arr;
         $infos = Pdb::fetchAll('*', $tables, $conds, $orderby, $tail);
