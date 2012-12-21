@@ -252,7 +252,10 @@ class PdoHelper {
         $fields = self::precomposite($fields);
         $tables = self::precomposite($tables);
         $where = $conds? "WHERE ".implode(' AND ', array_keys($conds)) : '';
-        $sm = $this->prepare("SELECT $fields FROM $tables $where $tail LIMIT 1");
+        if (is_array($orders))
+            $orders = implode (',', $orders);
+        $orders = $orders? "ORDER BY $orders" : '';
+        $sm = $this->prepare("SELECT $fields FROM $tables $where $orders $tail LIMIT 1");
         self::bindValues($sm, array_values($conds));
         if (!$sm->execute()) {
             d($this->getLog());
