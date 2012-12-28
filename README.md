@@ -89,3 +89,14 @@ function _req($name);
 - **SiteMap**
 
  生成 Google 的 SiteMap （还不完善）。
+
+更多的思考
+-----------
+
+最近看了好多的框架。
+
+原来 Java 考虑的好全面啊。
+
+如何用好ORM？ORM和高效是否背道而驰？
+
+还是得写ORM。
