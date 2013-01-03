@@ -10,6 +10,17 @@
  * @version 1.1
  */
 
+class FuturePdb
+{
+    private static $type = null;
+
+    public static function __callStatic($name, $arg)
+    {
+        $db = self::instance($type);
+        return call_user_func(array($db, $name) $arg);
+    }
+}
+
 class Pdb 
 {
     const MASTER = 1;

@@ -22,6 +22,7 @@ Very small framework for website write in PHP.
 和 LazyPHP 不同的地方有：
 
 1. 使用 PHP 做 router
+1. 使用自己的 Test 库
 
 这个框架还是极端的不成熟，不推荐日常使用。请使用久经考验的 LazyPHP 框架。
 
