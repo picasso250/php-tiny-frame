@@ -7,50 +7,53 @@
  * 此框架由王霄池纯粹手写而成，当然参照了不少鸡爷的框架，也参照了 LazyPHP
  */
 
-// 打开错误提示, SAE 可以 ini_set 将不起作用
-ini_set('display_errors', 1);
-error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+// 打开错误提示
+ini_set('display_errors', 1); // 在 SAE 上 ini_set() 不起作用，但也不会报错
+error_reporting(E_ALL);
 
-define('IN_PTF', 1);
+define('IN_APP', 1);
 
-require 'config/common.php';
+define('DS', DIRECTORY_SEPARATOR);
+define('APP_ROOT', __DIR__ . DS);
+define('CORE_ROOT', APP_ROOT . 'core' . DS);
+
+include APP_ROOT . 'config/common.php';
 
 // if not debug, mute all error reportings
 if (!(defined('DEBUG') ? DEBUG : 0)) {
-	ini_set('display_errors', 0);
-	error_reporting(0);
+    ini_set('display_errors', 0);
+    error_reporting(0);
 }
 
-require 'lib/function.php';
+require CORE_ROOT . 'function.php';
+require CORE_ROOT . 'app.php';
+init_var();
+init_env();
 
-// 变量初始化
-require 'core/init.php';
+require CORE_ROOT . 'BasicModel.php'; // 似乎可以到autoloader里面去
 
-ob_start();
-session_start();
-date_default_timezone_set('PRC');
+$user_lib_file = APP_ROOT . 'lib' . DS . 'function.php';
+if (file_exists($user_lib_file))
+    require_once $user_lib_file;
 
-require Pf::controller('init');
-
-if (isset($force_redirect)) { // 强制跳转 这个在整站关闭的时候很有用
-    $controller = $force_redirect;
+// all user excute this controller: init // 这里可以用BasicController继承的方式，似乎更优雅
+$init_controller_file = AppFile::controller('init');
+if (file_exists($init_controller_file)) {
+    include $init_controller_file;
+    user_init();
 }
-$view = $controller;
 
-if (!file_exists(Pf::controller($controller))) {
+$controller_file = AppFile::controller($controller);
+if (!file_exists($controller_file)) {
     $controller = 'default'; // page 404
+    $controller_file = AppFile::controller($controller);
 }
 
-if (file_exists(_css($controller)))
-    $page['styles'][] = $controller;
-if (file_exists(_js($controller)))
-    $page['scripts'][] = $controller;
-include Pf::controller($controller); // 执行 controller
+$view = $controller; // default view
 
-$arr = explode('?', $view);
-if (count($arr) == 2 && $arr[1] == 'master') {
-    $content = $arr[0];
-    $view = 'master';
-}
-include smart_view($view); // 渲染 view
-?>
+// include and execute controller
+include $controller_file;
+$controller_class = ucfirst($controller) . 'Controller';
+$c = new $controller_class();
+if ($target)
+    $c->$target();
