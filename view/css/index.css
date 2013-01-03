@@ -1,0 +1,98 @@
+/* 
+    Document   : index
+    Created on : Sep 22, 2012, 9:01:39 PM
+    Author     : ryan
+*/
+
+/* 介绍 */
+.introduction {
+    width: 604px;
+    margin: auto;
+    padding: 10px 0;
+}
+
+/* 留言发表框 */
+.post {
+    width: 604px;
+    margin: auto;
+    padding: 10px 0;
+}
+.post h2 {
+    font-weight: bold;
+    border-bottom: 2px solid #861818;
+    padding-bottom: 9px;
+}
+.post div {
+    margin: 10px 0;
+}
+.post .intro {
+    display: inline-block;
+    width: 4em;
+    text-align: right;
+}
+.post input[type=text], .post input[type=email] {
+    border-color: #b7b7b7;
+}
+.post input[type=text]:hover, .post input[type=email]:hover, .post input[type=text]:focus, .post input[type=email]:focus {
+    border-color: #333;
+}
+.post textarea {
+    width: 98%;
+    height: 5.1em;
+    font-size: large;
+    margin-bottom: 5px;
+    border-color: #b7b7b7;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.post textarea:hover {
+    border-color: #555;
+}
+.post textarea:focus {
+    border-color: #555;
+}
+.post textarea.disabled {
+    background-color: #b7b7b7;
+}
+.post input[type=submit] {
+    float: right;
+    background: #602D2D;
+    font-size: small;
+}
+.post input[type=submit]:hover {
+    background: #3A1515;
+}
+.post input[type=submit][disabled] {
+    color: #A2A2A2;
+    background-color: #616161;
+    cursor: default;
+}
+.post strong {
+    font-weight: bold;
+    color: #C12121;
+    margin: 0 3px;
+}
+
+/* 留言列表 */
+ul.msg {
+    margin: auto;
+    margin-top: 30px;
+    width: 604px;
+    clear: both;
+}
+ul.msg li.msg {
+    padding: 30px 0;
+}
+ul.msg li.msg .name {
+    font-weight: bold;
+    font-size: small;
+}
+ul.msg li.msg .time {
+    float: right;
+    font-size: small;
+    color: #616161;
+}
+ul.msg li.msg div {
+    margin-top: 8px;
+    overflow: hidden;
+}

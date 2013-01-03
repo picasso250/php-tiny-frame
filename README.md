@@ -100,3 +100,4 @@ function _req($name);
 如何用好ORM？ORM和高效是否背道而驰？
 
 还是得写ORM。
+

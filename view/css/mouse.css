@@ -1,0 +1,29 @@
+/* 
+    Document   : mouse
+    Created on : Sep 26, 2012, 10:18:01 PM
+    Author     : ryan
+    Description:
+        For screens like pc who has a mouse
+        So all hover will be here
+*/
+
+a:hover, .btn:hover {
+    opacity: 1;
+}
+body {
+    font-family: "宋";
+}
+
+/* 翻页 */
+.paging ol li.on a:hover {
+    color: #fff;
+    background: #333;
+    cursor: default;
+}
+.paging ol li a:hover {
+    background: #ddd;
+}
+.paging .next-page.btn:hover {
+    background: #333;
+    color: #fff;
+}
