@@ -1,0 +1,20 @@
+name: phptinyframe
+version: 1
+handle:
+- rewrite: if(path ~ "^/sitemap.xml$") goto "http://sayit-sayitstatic.stor.sinaapp.com/sitemap.xml"
+- rewrite: if(!is_file() && path ~ "^/(.*)/(.*)") goto "/index.php?c=$1&target=$2&%{QUERY_STRING}"
+- rewrite: if(!is_file() && path ~ "^/(.*)") goto "/index.php?c=$1&%{QUERY_STRING}"
+- rewrite: if(!is_file()) goto "/index.php?%{QUERY_STRING}"
+
+- compress: if ( out_header["Content-type"]=="text/css" ) compress
+- compress: if ( out_header["Content-type"]=="text/plain" ) compress
+- compress: if ( out_header["Content-type"]=="text/javascript" ) compress
+- compress: if ( out_header["Content-type"]=="application/javascript" ) compress
+- compress: if ( out_header["Content-type"]=="text/html" ) compress
+
+- expire: if(path ~ "\.js$") time 2629000
+- expire: if(path ~ "\.css$") time 2629000
+- expire: if(path ~ "\.jpg$") time 2629000
+- expire: if(path ~ "\.png$") time 2629000
+- expire: if(path ~ "\.gif$") time 2629000
+- expire: if(path ~ "\.ico$") time 2629000
