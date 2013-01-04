@@ -52,6 +52,66 @@ model 是类。
 所有的 Model 都可以继承了一个我已经写好的 BasicModel 类，里面有一些基本的增删改查的函数。
 
 
+简明教程
+--------------
+
+假设你在做豆瓣小组。
+
+首先，看看网址：
+
+`/group/topic/35708257/`
+
+当用户访问这个网址的时候，框架将会做这样一个工作：
+
+```php
+$controller = new GroupController();
+$controller->topic('35708257');
+```
+
+所以，你需要在 `controller` 文件夹里加入一个 `Group.php` 文件，作为 `group` 的控制器。
+
+在这个文件里，你需要定义一个类：
+
+```php
+class GroupController
+{
+    public function topic($topicId) // $topicId === '35708257'
+    {
+        // 获取数据
+        // ...
+
+        // 渲染视图
+        render_view('master');
+    }
+}
+```
+
+现在让我们继续完善这个 `topic()` 方法吧。
+
+假设数据库已经齐备。
+
+那么我们如何获取数据呢？我们要写好 Model 层。
+
+在 `model` 文件夹里新建一个 `Topic.php` 文件。内容如下：
+
+```php
+class Topic extends BasicModel
+{
+}
+```
+
+现在我们回到 `GroupController` 的 `topic()` 方法：
+
+```php
+public function topic($topicId)
+{
+    // 获取数据
+    $topic = new Topic($topicId);
+    echo $topic->title;
+}
+```
+
+
 常用函数
 --------
 

@@ -55,5 +55,6 @@ $view = $controller; // default view
 include $controller_file;
 $controller_class = ucfirst($controller) . 'Controller';
 $c = new $controller_class();
-if ($target)
-    $c->$target();
+if ($target) {
+    $c->$target($argument);
+}
