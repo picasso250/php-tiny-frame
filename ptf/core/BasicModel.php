@@ -131,6 +131,6 @@ class BasicModel
 
     public static function search()
     {
-        return new Searcher(get_called_class(), self::tabel());
+        return new Searcher(get_called_class());
     }
 }

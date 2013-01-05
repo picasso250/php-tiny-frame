@@ -90,7 +90,7 @@ class GroupController extends BasicController
 
 这个方法的前半部分从数据库里获取数据，而后半部分渲染视图。下面，我们将分别将这两部分补充完成。
 
-首先，让我们假设数据库已经齐备。有两个表，topic 和 user。
+首先，让我们假设数据库已经齐备。有一个 topic 表。
 
 ```mysql
 -- --------------------------------------------------------
@@ -101,27 +101,15 @@ class GroupController extends BasicController
 
 CREATE TABLE `topic` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `author` int(10) unsigned NOT NULL,
+  `author` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `content` varchar(6000) COLLATE utf8_unicode_ci NOT NULL,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- 表的结构 `user`
---
-
-CREATE TABLE `user` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ```
 
-大家可以粗略的看一下 topic 表的结构。
+大家可以粗略浏览一下两个表的结构。
 
 那么我们如何获取数据呢？这个样子就可以了：
 
@@ -136,16 +124,93 @@ public function topic($topicId)
 
 `$topic->title` 就是标题，而 `$topic->content` 自然就是内容啦。很简单吧。不过，要想实现这种用面向对象的方式访问数据库，我们首先要写好 Model 层。也就是传说中的 ORM 啦。
 
-在 `model` 文件夹里新建一个 `Topic.php` 文件。内容如下：
+在 `model` 文件夹里新建一个 `Topic.php` 文件。注意，这个类的名称一定要是表名首字母大写（不这样也可以，但你就得多写一行代码）。
+内容如下：
 
 ```php
-class Topic extends BasicModel
+class Topic extends BasicModel // 继承自 BasicModel，这是重点！
 {
 }
 ```
 
-现在
+现在你就拥有一个最基本的 ORM 了。上面的 `group` 中的 `topic` 方法。已经可以工作了。
 
+render
+
+** ORM 进阶 **
+
+你把上面的 豆瓣小组 交付之后，主管很严肃的过来找你谈心，他说你这里有个重要的功能还没做，那就是回复功能。于是你开始思考回复功能怎么做。
+
+首先看网址：
+
+`/group/reply/35708257/`
+
+当然，真实的豆瓣不是这个网址，为了更加适应 ptf 框架，所以我这个样子设计网址。
+
+然后构建出数据库：
+
+```mysql
+--
+-- 表的结构 `comment`
+--
+
+CREATE TABLE `comment` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `topic` int(10) unsigned NOT NULL COMMENT 'topic id',
+  `author` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `content` varchar(6000) COLLATE utf8_unicode_ci NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+```
+
+可以看到，表 `comment` 的 `topic` 字段对应 `topic` 表。
+
+这样之后，我们在 `model` 文件夹下新建一个文件：`Comment.php`
+
+```php
+class Comment extends BasicModel 
+{
+    protected $relationMap = array('topic' => 'topic');
+}
+```
+
+但是，注意，我们 comment 表有一个外键，所以，要写一个 relation map。这个 relation map 的 key 是外键的名称，value 是对应的表名。一般而言，二者是相同的名称。
+
+然后，我们想当然的在 `controller` 里这么调用：
+
+```php
+public function topic()
+{
+    $topic = new Topic($topicId);
+    $comments = $topic->comments();
+}
+```
+
+`$comments` 就是一个 array，里面装满了 Comment 对象。
+
+为了让我们想当然的代码工作，我们还得填写 `Topic::comments()` 方法。
+
+这个方法是这样的：
+
+```php
+class Topic extends BasicModel 
+{
+    public function comments()
+    {
+        return Comment::search()->filterBy('topic', $this)->find(); // 这就是见证奇迹的代码
+    }
+}
+```
+
+好了，现在我们的代码已经可以正常工作了。
+不过，你肯定很好奇见证奇迹的代码是如何工作的。
+
+```php
+$searcher = Model::search();        // 这是一个搜索者，专门用来获取数据库中的数据。
+$searcher->filterBy('key', $value); // 指定一个 filter（过滤器）
+$data = $searcher->find();          // 使用 `Searcher::find()` 方法获取数据
+```
 
 常用函数
 --------

@@ -15,21 +15,34 @@ class Searcher
     private $limit = null;
     private $offset = 0;
     
-    public function __construct($class, $table)
+    public function __construct($class)
     {
-        $this->table = $table;
         $this->class = $class;
+        $this->table = $class::table();
     }
 
     public function filterBy($exp, $value)
     {
-        if (preg_match('/\b(\w+)\.\w+\b/', $exp, $matches)) {
+        if (is_a($value, 'BasicModel'))
+            $value = $value->id;
+
+        $relationMap = $this->class::relationMap();
+        $tableDotKey = preg_match('/\b(\w+)\.(\w+)\b/', $exp, $matches); // table.key = ?
+        $tableDotId = isset($relationMap[$exp]);
+        
+        if ($tableDotKey) {
             $ref = $matches[1];
-            $this->conds["$this->table.$ref=$ref.id"] = null;
-            $this->conds["$ref.id=?"] = $value;
+            $refKey = $matches[2];
+            $refTable = $relationMap[$ref];
+            $this->conds["$refTable.$refKey=?"] = $value;
+        } elseif ($tableDotId) {
+            $refTable = $relationMap[$exp];
+            $this->conds["$refTable.id=?"] = $value;
         } else {
             $this->conds[$exp] = $value;
         }
+        if ($tableDotKey || $tableDotId)
+            $this->conds["$this->table.$ref=$refTable.id"] = null;
         return $this;
     }
 
