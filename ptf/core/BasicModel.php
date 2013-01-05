@@ -11,7 +11,7 @@ class BasicModel
     protected $id = null;
     protected $info = null;
     
-    public function __construct($para) 
+    public function __construct($para)
     {
         if (is_array($para) && isset($para['id'])) {
             $this->id = $para['id'];
@@ -45,18 +45,9 @@ class BasicModel
         return Pdb::count($tables, $conds);
     }
 
-    public static function read($conds = array())
+    public function toArray()
     {
-        $self = get_called_class();
-        $arr = $self::buildDbArgs($conds);
-        if (count($arr) != 4) {
-            throw new Exception("build db arg, not 4", 1);
-        }
-        list($tables, $conds, $orderby, $tail) = $arr;
-        $infos = Pdb::fetchAll('*', $tables, $conds, $orderby, $tail);
-        return array_map(function ($info) use($self) {
-            return new $self($info);
-        }, $infos);
+        return $this->info();
     }
 
     public function info() // will this bug?
@@ -86,7 +77,7 @@ class BasicModel
         if (isset($self::$table))
             return $self::$table;
         else 
-            return strtolower($self);
+            return camel2under($self); // camal to underscore
     }
 
     public function update($key_or_array, $value = null)
@@ -138,12 +129,8 @@ class BasicModel
         Pdb::del(self::table(), $this->selfCond());
     }
 
-    protected static function buildDbArgs($conds = array())
+    public static function search()
     {
-        $tables = self::table();
-        $conds = array();
-        $orderby = array();
-        $tail = '';
-        return array($tables, $conds, $orderby, $tail);
+        return new Searcher(get_called_class(), self::tabel());
     }
 }

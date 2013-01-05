@@ -73,7 +73,7 @@ $controller->topic('35708257');
 在这个文件里，你需要定义一个类：
 
 ```php
-class GroupController
+class GroupController extends BasicController
 {
     public function topic($topicId) // $topicId === '35708257'
     {

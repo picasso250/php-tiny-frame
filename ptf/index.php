@@ -36,12 +36,9 @@ $user_lib_file = APP_ROOT . 'lib' . DS . 'function.php';
 if (file_exists($user_lib_file))
     require_once $user_lib_file;
 
-// all user excute this controller: init // 这里可以用BasicController继承的方式，似乎更优雅
-$init_controller_file = AppFile::controller('init');
-if (file_exists($init_controller_file)) {
-    include $init_controller_file;
-    user_init();
-}
+$basic_controller_file = AppFile::controller('basic');
+if (file_exists($basic_controller_file))
+    include $basic_controller_file;
 
 $controller_file = AppFile::controller($controller);
 if (!file_exists($controller_file)) {
