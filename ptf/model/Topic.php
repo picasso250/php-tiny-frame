@@ -1,16 +1,11 @@
 <?php
-!defined('IN_PTF') && exit('ILLEGAL EXECUTION');
-
-include_once Pf::model('Model');
 
 /**
  *
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
-class Message extends Model {
+class Topic extends BasicModel {
 
-    public static $table = 'msg';
-    
     public static function post($name, $text, $email = '') {
         $arr = compact('name', 'text', 'email');
         $arr['time=NOW()'] = null;
@@ -54,5 +49,3 @@ class Message extends Model {
     }
 
 }
-
-?>

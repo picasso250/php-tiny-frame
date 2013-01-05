@@ -23,8 +23,19 @@ class Searcher
 
     public function filterBy($exp, $value)
     {
-        $this->conds[$exp] = $value;
+        if (preg_match('/\b(\w+)\.\w+\b/', $exp, $matches)) {
+            $ref = $matches[1];
+            $this->conds["$this->table.$ref=$ref.id"] = null;
+            $this->conds["$ref.id=?"] = $value;
+        } else {
+            $this->conds[$exp] = $value;
+        }
         return $this;
+    }
+
+    public function orderBy($exp)
+    {
+        $this->orders[] = "$this->table.$exp";
     }
 
     public function limit()

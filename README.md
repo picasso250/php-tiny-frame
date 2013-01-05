@@ -55,20 +55,22 @@ model 是类。
 简明教程
 --------------
 
-假设你在做豆瓣小组。
+自古以来，示例就是快速学习的不二法门，本教程也不例外。
 
-首先，看看网址：
+假设著名互联网豆瓣的服务器不幸坏掉了，整个网站都需要重做，而你被分配做豆瓣小组。
+
+首先，我们分析一下网址：
 
 `/group/topic/35708257/`
 
-当用户访问这个网址的时候，框架将会做这样一个工作：
+这个网站分为三个部分，`group`，`topic`和`35708257`。当用户访问这个网址的时候，ptf 框架将会做这样一个工作：
 
 ```php
 $controller = new GroupController();
 $controller->topic('35708257');
 ```
 
-所以，你需要在 `controller` 文件夹里加入一个 `Group.php` 文件，作为 `group` 的控制器。
+所以，你需要在 `controller` 文件夹里加入一个 `group.php` 文件，作为 `group` 的控制器。
 
 在这个文件里，你需要定义一个类：
 
@@ -86,21 +88,42 @@ class GroupController extends BasicController
 }
 ```
 
-现在让我们继续完善这个 `topic()` 方法吧。
+这个方法的前半部分从数据库里获取数据，而后半部分渲染视图。下面，我们将分别将这两部分补充完成。
 
-假设数据库已经齐备。
+首先，让我们假设数据库已经齐备。有两个表，topic 和 user。
 
-那么我们如何获取数据呢？我们要写好 Model 层。
+```mysql
+-- --------------------------------------------------------
 
-在 `model` 文件夹里新建一个 `Topic.php` 文件。内容如下：
+--
+-- 表的结构 `topic`
+--
 
-```php
-class Topic extends BasicModel
-{
-}
+CREATE TABLE `topic` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `author` int(10) unsigned NOT NULL,
+  `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `content` varchar(6000) COLLATE utf8_unicode_ci NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `user`
+--
+
+CREATE TABLE `user` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ```
 
-现在我们回到 `GroupController` 的 `topic()` 方法：
+大家可以粗略的看一下 topic 表的结构。
+
+那么我们如何获取数据呢？这个样子就可以了：
 
 ```php
 public function topic($topicId)
@@ -110,6 +133,18 @@ public function topic($topicId)
     echo $topic->title;
 }
 ```
+
+`$topic->title` 就是标题，而 `$topic->content` 自然就是内容啦。很简单吧。不过，要想实现这种用面向对象的方式访问数据库，我们首先要写好 Model 层。也就是传说中的 ORM 啦。
+
+在 `model` 文件夹里新建一个 `Topic.php` 文件。内容如下：
+
+```php
+class Topic extends BasicModel
+{
+}
+```
+
+现在
 
 
 常用函数
