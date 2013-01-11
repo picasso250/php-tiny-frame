@@ -1,8 +1,7 @@
 <?php
 
 /**
-* xxx
-* former Pdb is heavy, because it has to be compatiable with former files
+* Former Pdb is heavy, because it has to be compatiable with former files
 * and then, I have not been useing Modle layer
 * Now since I have used ORM, it's better to write a more light Sql Db class
 */
