@@ -228,7 +228,8 @@ class PdoHelper {
     private $db = null;
     private $sql_history = array();
 
-    function __construct($config, $ms = self::MASTER) {
+    function __construct($config, $ms = self::MASTER) 
+    {
         if (empty($config)) {
             throw new \Exception('config emtpy');
         }
@@ -240,25 +241,21 @@ class PdoHelper {
         $this->db->exec('SET character_set_connection=UTF8, character_set_results=UTF8, character_set_client=binary'); // unpredictable
     }
 
-    private function prepare($sql) {
+    private function prepare($sql) 
+    {
         $this->sql_history[] = $sql;
         return $this->db->prepare($sql); // use & ??
     }
 
-    // 已废弃
-    // private static function usefulValues($arr) {
-    //     return array_filter($arr, function ($v) {
-    //         return !($v === false);
-    //     });
-    // }
-    private static function precomposite($para) {
+    private static function precomposite($para) 
+    {
         if (is_array($para))
-            $para = implode(',', $para);
+            $para = implode(', ', $para);
         return $para;
     }
 
     public function fetchRow($fields, $tables, $conds = array(), $orders = array(), $tail='') { // why there is $orders ????
-        if ($conds === null) 
+        if ($conds === null)
             $conds = array();
         $fields = self::precomposite($fields);
         $tables = self::precomposite($tables);
@@ -278,9 +275,8 @@ class PdoHelper {
         $ret = $sm->fetch(PDO::FETCH_ASSOC);
         if ($ret === false)
             return false;
-        if (count($ret) === 1) {
-            $ret = reset($ret);
-        }
+        if (count($ret) === 1)
+            return reset($ret);
         return $ret;
     }
 

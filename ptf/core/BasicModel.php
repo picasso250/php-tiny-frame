@@ -4,8 +4,6 @@
  * @author ryan
  */
 
-// get_called_class() can be replaced by static::
-
 class BasicModel
 {
     protected $id = null;
@@ -30,7 +28,7 @@ class BasicModel
     {
         $self = get_called_class();
         Pdb::insert($info, $self::$table);
-        return new self(Pdb::lastInsertId());
+        return new $self(Pdb::lastInsertId());
     }
 
     public static function count($conds = array())
@@ -62,11 +60,10 @@ class BasicModel
 
     public function exists()
     {
-        $self = get_called_class();
-        return Pdb::exists($self::$table, $this->selfCond());
+        return Pdb::exists(static::table(), $this->selfCond());
     }
 
-    public function selfCond() 
+    public function selfCond()
     {
         return array('id = ?' => $this->id);
     }
@@ -119,8 +116,7 @@ class BasicModel
             $class = ucfirst($name);
             return new $class($this->info[$prop]);
         } else {
-            throw new Exception("no ", 1);
-            
+            throw new Exception("no $prop", 1);
         }
     }
 
