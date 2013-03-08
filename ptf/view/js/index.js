@@ -1,3 +1,0 @@
-$(function () {
-    $('.post form').sentencePoster();
-});
