@@ -42,7 +42,8 @@ function g($a)
 
 /* html node */
 
-function js_node($src='', $code='') {
+function js_node($src='', $code='') 
+{
     $src_str = $src? ' src="' . ROOT . 'static/js/'.$src.'.js?v='. JS_VER .'"' : '';
     return '<script type="text/javascript"'.$src_str.'>'.$code.'</script>';
 }
@@ -54,22 +55,26 @@ function css_node($src='', $type='css') {
     return "<link $rel $type $href />";
 }
 
-function js_var($var_name, $arr) {
+function js_var($var_name, $arr) 
+{
     return js_node('', $var_name.'='.json_encode($arr));
 }
 
-function _css($file) {
+function _css($file) 
+{
     return ROOT . "view/css/$file.css";
 }
 
-function _js($file) {
+function _js($file) 
+{
     return ROOT . "view/js/$file.js";
 }
 
 /* debug helpers */
 
 // little function to help us print_r() or var_dump() things
-function d($var, $var_dump=0) {
+function d($var, $var_dump=0) 
+{
     if (!(defined('DEBUG') ? DEBUG : 1)) 
         return;
 
@@ -106,7 +111,8 @@ function d($var, $var_dump=0) {
  * @return type
  * @throws Exception
  */
-function image_resize ($file_content, $crop, $width, $height, $new_width, $new_height) {
+function image_resize ($file_content, $crop, $width, $height, $new_width, $new_height) 
+{
     if ($new_width < 1 || $new_height < 1) {
         throw new Exception('specified size too small');
     } else if ($width<$new_width || $height<$new_height) {
@@ -136,7 +142,8 @@ function image_resize ($file_content, $crop, $width, $height, $new_width, $new_h
  * @return string url of the final img
  * @throws Exception
  */
-function make_image($image, $opt=array()) {
+function make_image($image, $opt=array()) 
+{
     
     // deault option
     $opt = array_merge(array(
@@ -182,7 +189,8 @@ function make_image($image, $opt=array()) {
     }
 }
 
-function image_file_resize($tmp_img_file, $image_type, $crop, $new_width, $new_height) {
+function image_file_resize($tmp_img_file, $image_type, $crop, $new_width, $new_height) 
+{
     list($width, $height) = getimagesize($tmp_img_file);
     switch ($image_type) {
         case 'jpg':
@@ -209,7 +217,8 @@ function image_file_resize($tmp_img_file, $image_type, $crop, $new_width, $new_h
 }
 
 // write file content to dst
-function write_upload($content, $file_name) {
+function write_upload($content, $file_name) 
+{
     if (ON_SERVER) {
         $up_domain = UP_DOMAIN;
         $s = new SaeStorage();
@@ -240,7 +249,8 @@ function write_upload($content, $file_name) {
     }
 }
 
-function file_ext($file_name) {
+function file_ext($file_name) 
+{
     $arr = explode('.', $file_name);
     if (count($arr) < 2) {
         throw new Exception('bad file name: ' . $image['name']);
@@ -260,11 +270,13 @@ function camel2under($str)
 }
 
 // now you'd better use this name
-function underscoreToCamelCase($value) {
+function underscoreToCamelCase($value) 
+{
     return implode(array_map(function($value) { return ucfirst($value); }, explode('_', $value)));
 }
  
-function camelCaseToUnderscore($value) {
+function camelCaseToUnderscore($value) 
+{
     return preg_replace_callback('/([A-Z])/', function($char) { return '_'.strtolower($char[1]); }, lcfirst($value));
 }
 
@@ -274,7 +286,8 @@ function camelCaseToUnderscore($value) {
 //     could be out link, such "http://google.com"
 //     also could be absulote path, such as "/root/login"
 //     the begining "/" could be omitted
-function redirect($url='') {
+function redirect($url='') 
+{
     // 1. out link ==> directly
     // 2. inner link (without root) ==> add ROOT first
     // 3. inner link (with root) ==> directly
@@ -285,7 +298,8 @@ function redirect($url='') {
     exit();
 }
 
-function sae_log($msg){
+function sae_log($msg)
+{
     sae_set_display_errors(false); //关闭信息输出
     sae_debug($msg); //记录日志
     sae_set_display_errors(true); //记录日志后再打开信息输出，否则会阻止正常的错误信息的显示
@@ -340,7 +354,8 @@ function build_nav($str)
     return $arr;
 }
 
-function widget($name, $opts = array()) {
+function widget($name, $opts = array()) 
+{
     extract($opts);
     include AppFile::view("widget.$name");
 }
