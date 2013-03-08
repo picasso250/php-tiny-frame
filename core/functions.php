@@ -9,36 +9,35 @@ function i(&$param, $or='') {
     return isset($param)? $param : $or;
 }
 
-function _req($para, $default = '') 
+function _req($name, $default = null) 
 {
-    return isset($_REQUEST[$para]) && $_REQUEST[$para] ? trim($_REQUEST[$para]) : $default;
+    return isset($_REQUEST[$name]) ? trim($_REQUEST[$name]) : $default;
 }
 
-function _post($vars)
+function _post($name, $default = null)
 {
-    $ret = make_array_by_name_list_from_source(func_get_args(), $_POST);
-    return (1 === func_num_args()) ? reset($ret) : $ret;
+    return isset($_POST[$name]) ? trim($_GET[$name]) : null;
 }
 
-function _get($vars)
+function _get($name, $default = null)
 {
-    $ret = make_array_by_name_list_from_source(func_get_args(), $_GET);
-    return (1 === func_num_args()) ? reset($ret) : $ret;
+    return isset($_GET[$name]) ? trim($_GET[$name]) : null;
 }
 
-function make_array_by_name_list_from_source($namelist, &$source_arr)
+function g($a)
 {
-    // what if $namelist is an empty array
-    $default = ''; // maybe default should be null
-    return array_map(function ($name) use($source_arr, $default) {
-        if (isset($source_arr[$name])) {
-            // value can be array also, not just string types
-            $value = $source_arr[$name];
-            return is_array($value) ? $value : trim($value);
-        } else {
-            return $default;
+    // get
+    if (is_string($a)) { // get
+        return isset($GLOBALS[$a]) ? $GLOBALS[$a] : null;
+    } 
+    // set
+    if (is_array($a)) { // set
+        foreach ($a as $key => $value) {
+            $GLOBALS[$key] = $value;
         }
-    }, $namelist);
+    } else {
+        throw new Exception("$a is not good arg when get from $GLOBALS");
+    }
 }
 
 /* html node */
@@ -260,6 +259,15 @@ function camel2under($str)
     return strtolower($str);
 }
 
+// now you'd better use this name
+function underscoreToCamelCase($value) {
+    return implode(array_map(function($value) { return ucfirst($value); }, explode('_', $value)));
+}
+ 
+function camelCaseToUnderscore($value) {
+    return preg_replace_callback('/([A-Z])/', function($char) { return '_'.strtolower($char[1]); }, lcfirst($value));
+}
+
 
 // usage: 
 //     $url could be empty, which will go to index, 
@@ -336,3 +344,4 @@ function widget($name, $opts = array()) {
     extract($opts);
     include AppFile::view("widget.$name");
 }
+
