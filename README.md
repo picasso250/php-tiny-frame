@@ -7,24 +7,32 @@ Very small framework for website write in PHP.
 
 （我猜很多 PHP 程序员都坐过这种事情，写了个小框架，然后慢慢放弃，转而使用别人的框架（比较大的）。或许这就是成长，没有小框架，要我们如何理解大框架？）
 
-我的初衷就是写一个自己用的顺手，又很轻型的 PHP 框架。这个框架参考了 **鸡爷** 的自用框架，也参考了 [LazyPHP3](https://github.com/easychen/LazyPHP)。在此一并表示感谢。
+**我的目的**
 
-这个框架比 LazyPHP 相同之处有：
+- 我自己用的顺手
+- 运行效率比较高的框架
+- 简洁
+- 支持 SAE
+
+这个框架参考了 **鸡爷** 的自用框架，也参考了 [LazyPHP3](https://github.com/easychen/LazyPHP)。在此一并表示感谢。
+
+这个框架和 LazyPHP 的相同之处有：
 
 1. MVC 结构
 2. 使用 BootStrap 作为前端框架
 
-现在这个框架比 LazyPHP 多的特征有：
+比 LazyPHP 多的特征有：
 
-1. 一个 PDO 封装的db访问类，杜绝 SQL 注入
-2. 一个极端简单的 ORM
+1. 一个 PDO 封装的 db 访问类，杜绝 SQL 注入
+2. 模仿 [Doctrine](http://www.doctrine-project.org/) 的一个极端简单的 ORM
 
 和 LazyPHP 不同的地方有：
 
 1. 使用 PHP 做 router
+2. Controller 层使用 function
 1. 使用自己的 Test 库
 
-这个框架还是极端的不成熟，不推荐日常使用。请使用久经考验的 LazyPHP 框架。
+**这个框架还是极端的不成熟，不推荐日常使用。**
 
 文件结构
 ---------------
