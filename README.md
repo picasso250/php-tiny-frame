@@ -24,11 +24,9 @@ Very small framework for website write in PHP.
 这个框架有如下特征：
 
 1. MVC 结构
-2. 使用 BootStrap 作为前端框架
 1. PDO 封装的 DB 访问类，杜绝 SQL 注入
 2. 模仿 [Idiorm](http://www.doctrine-project.org/) 的一个简单的 ORM
 1. 使用 PHP 做 router
-2. Controller 层使用 function
 1. 使用自己的 Test 库
 
 **这个框架还是极端的不成熟，不推荐日常使用。**
