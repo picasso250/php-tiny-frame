@@ -3,6 +3,8 @@
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
 
+namespace ptf;
+
 /* $_GET, $_POST, $_REQUEST helpers or shortens */
 
 function _req($name, $default = null) 

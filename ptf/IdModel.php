@@ -1,5 +1,7 @@
 <?php
 
+namespace ptf;
+
 /**
  * @author ryan
  */

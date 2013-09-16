@@ -1,9 +1,10 @@
 <?php
 
+namespace ptf;
+
 /**
  * @author ryan
  */
-
 class Searcher
 {
     private $class = null;

@@ -1,4 +1,7 @@
 <?php
+
+namespace ptf;
+
 /**
  * 这个文件定义了一系列全局函数，用来操作APP
  * @author  ryan <cumt.xiaochi@gmail.com>
