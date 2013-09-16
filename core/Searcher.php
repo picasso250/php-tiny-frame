@@ -6,17 +6,25 @@
 
 class Searcher
 {
-    private $table = null;
     private $class = null;
-    private $wheres = array();
-    private $orders = array();
-    private $limit = null;
-    private $offset = 0;
+
+    protected $count;
+    protected $columns;
+    protected $table;
+    protected $alias;
+    protected $wheres;
+    protected $havings;
+    protected $groupbys;
+    protected $orderbys;
+    protected $distinct;
+    protected $limit;
+    protected $offset;
     
     public function __construct($class)
     {
         $this->class = $class;
         $this->table = $class::table();
+        $this->initBuilds();
     }
 
     /**
@@ -174,6 +182,13 @@ class Searcher
         return new ResultSet($rows);
     }
 
+    public function makeEntity($row)
+    {
+        $o = new $this->class;
+        $o->fillWith($row);
+        return $o;
+    }
+
     public function count() 
     {
         $this->limit(1);
@@ -255,6 +270,31 @@ class Searcher
             return "`$key`";
         }
         return $key;
+    }
+
+    public function execute($sql, $args = array())
+    {
+        $r = PdoWrapper::execute($sql, $args);
+        $this->initBuilds();
+        return $r;
+    }
+
+    /**
+     * 重置搜索条件
+     */
+    protected function initBuilds()
+    {
+        $this->count = false;
+        $this->columns = array();
+        $this->table = null;
+        $this->as = null;
+        $this->wheres = array();
+        $this->havings = array();
+        $this->groupbys = array();
+        $this->orderbys = array();
+        $this->distinct = false;
+        $this->limit = null;
+        $this->offset = null;
     }
 
 }

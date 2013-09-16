@@ -50,4 +50,9 @@ class Model
     {
         return new Searcher(get_called_class());
     }
+
+    public function fillWith($data)
+    {
+        $this->row = $data;
+    }
 }

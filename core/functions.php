@@ -5,23 +5,19 @@
 
 /* $_GET, $_POST, $_REQUEST helpers or shortens */
 
-function i(&$param, $or='') {
-    return isset($param)? $param : $or;
-}
-
 function _req($name, $default = null) 
 {
-    return isset($_REQUEST[$name]) ? trim($_REQUEST[$name]) : $default;
+    return isset($_REQUEST[$name]) ? ($_REQUEST[$name]) : $default;
 }
 
 function _post($name, $default = null)
 {
-    return isset($_POST[$name]) ? trim($_GET[$name]) : null;
+    return isset($_POST[$name]) ? ($_GET[$name]) : null;
 }
 
 function _get($name, $default = null)
 {
-    return isset($_GET[$name]) ? trim($_GET[$name]) : null;
+    return isset($_GET[$name]) ? ($_GET[$name]) : null;
 }
 
 function g($a)
@@ -35,67 +31,7 @@ function g($a)
         foreach ($a as $key => $value) {
             $GLOBALS[$key] = $value;
         }
-    } else {
-        throw new Exception("$a is not good arg when get from $GLOBALS");
     }
-}
-
-/* html node */
-
-function js_node($src='', $code='') 
-{
-    $src_str = $src? ' src="' . ROOT . 'static/js/'.$src.'.js?v='. JS_VER .'"' : '';
-    return '<script type="text/javascript"'.$src_str.'>'.$code.'</script>';
-}
-
-function css_node($src='', $type='css') {
-    $rel = 'rel="stylesheet'.($type!='css'?'/'.$type:'').'"';
-    $href = 'href="'.ROOT.'static/css/'.$src.'.'.$type.'?v='. CSS_VER .'"';
-    $type = 'type="text/css"';
-    return "<link $rel $type $href />";
-}
-
-function js_var($var_name, $arr) 
-{
-    return js_node('', $var_name.'='.json_encode($arr));
-}
-
-function _css($file) 
-{
-    return ROOT . "view/css/$file.css";
-}
-
-function _js($file) 
-{
-    return ROOT . "view/js/$file.js";
-}
-
-/* debug helpers */
-
-// little function to help us print_r() or var_dump() things
-function d($var, $var_dump=0) 
-{
-    if (!(defined('DEBUG') ? DEBUG : 1)) 
-        return;
-
-    $is_cli = (PHP_SAPI === 'cli');                              // is cli mode
-    $is_ajax = isset($GLOBALS['is_ajax']) && $GLOBALS['is_ajax']; // compitible for low version
-    $by_ajax = isset($GLOBALS['by_ajax']) && $GLOBALS['by_ajax']; // ajax
-    $html_mode = !($is_cli || $is_ajax || $by_ajax);            // will display in html?
-
-    if ($html_mode) 
-        echo '<p><pre>';
-    echo PHP_EOL;
-    if ($var_dump) {
-        var_dump($var);
-    } elseif (is_array($var) || is_object($var)) {
-        print_r($var);
-    } else {
-        var_dump($var);
-    }
-    if ($html_mode) 
-        echo '</pre></p>';
-    echo PHP_EOL;
 }
 
 /* image upload helpers */
@@ -309,60 +245,5 @@ function sae_log($msg)
     sae_set_display_errors(false); //关闭信息输出
     sae_debug($msg); //记录日志
     sae_set_display_errors(true); //记录日志后再打开信息输出，否则会阻止正常的错误信息的显示
-}
-
-function build_nav($str)
-{
-    $str = trim($str);
-    $arr = array();
-    $lines = explode(PHP_EOL, $str); // 问题来了
-    $top_key = '';
-    foreach ($lines as $line) {
-        if (empty($line)) 
-            continue;
-        if (strpos($line, ' ') === 0) { // sub，甚至，我们可以检查两个空格？
-            if (empty($top_key)) {
-                throw new Exception('no top key, that means you did not put a top level first, please remove the leading spaces');
-            }
-            $line = trim($line);
-
-            $arr_ = explode(' ', $line);
-            array_shift($arr_); // remove leading char
-            $count = count($arr_);
-            if ($count < 1)
-                throw new Exception("line: $line, must with leading + or -");
-            if ($count < 2) {
-                $arr_[] = '';
-            }
-            list($name, $link) = $arr_;
-
-            if (!isset($top_key['sub'])) {
-                $top_key['sub'] = array();
-            }
-            $arr[$top_key]['sub'][] = array(
-                'name' => $name,
-                'link' => $link);
-
-            // default
-            $default = strpos($line, '+') === 0;
-            if ($default) {
-                $arr[$top_key]['default'] = $link;
-            }
-        } else { // top
-            list($title, $name) = explode(' ', $line);
-            $top_key = trim($name);
-            if (empty($name)) {
-                throw new Exception('you must provide a name');
-            }
-            $arr[trim($name)] = array('title' => trim($title));
-        }
-    }
-    return $arr;
-}
-
-function widget($name, $opts = array()) 
-{
-    extract($opts);
-    include AppFile::view("widget.$name");
 }
 
