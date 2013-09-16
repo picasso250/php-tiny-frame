@@ -14,20 +14,19 @@ Very small framework for website write in PHP.
 - 简洁
 - 支持 SAE
 
-这个框架参考了 **鸡爷** 的自用框架，也参考了 [LazyPHP3](https://github.com/easychen/LazyPHP)。在此一并表示感谢。
+这个框架参考了
+- **鸡爷** 的自用框架，
+- [LazyPHP3](https://github.com/easychen/LazyPHP)
+- Idiorm
+- Klein
+在此一并表示感谢。
 
-这个框架和 LazyPHP 的相同之处有：
+这个框架有如下特征：
 
 1. MVC 结构
 2. 使用 BootStrap 作为前端框架
-
-比 LazyPHP 多的特征有：
-
-1. 一个 PDO 封装的 db 访问类，杜绝 SQL 注入
-2. 模仿 [Doctrine](http://www.doctrine-project.org/) 的一个极端简单的 ORM
-
-和 LazyPHP 不同的地方有：
-
+1. PDO 封装的 DB 访问类，杜绝 SQL 注入
+2. 模仿 [Idiorm](http://www.doctrine-project.org/) 的一个简单的 ORM
 1. 使用 PHP 做 router
 2. Controller 层使用 function
 1. 使用自己的 Test 库
@@ -63,35 +62,52 @@ model 是类。
 简明教程
 --------------
 
-自古以来，示例就是快速学习的不二法门，本教程也不例外。
+**配置与运行**
 
-假设著名互联网豆瓣的服务器不幸坏掉了，整个网站都需要重做，而你被分配做豆瓣小组。
+```php
+$app = new PtfApp;
+$app->config(require __DIR__.'/config.php');
+$app->run();
+```
 
-首先，我们分析一下网址：
+在 `config.php` 中，你需要配置各种
+
+```php
+return array(
+    'db' => array()
+);
+```
+
+**路由**
+
+以豆瓣小组为例，我们分析一下网址：
 
 `/group/topic/35708257/`
 
-这个网站分为三个部分，`group`，`topic`和`35708257`。当用户访问这个网址的时候，ptf 框架将会做这样一个工作：
+当用户访问这个网址的时候，我们希望服务器执行我们写的特定代码。这个功能就叫做路由。在ptf中，你需要这样做。
 
 ```php
-$controller = new GroupController();
-$controller->topic('35708257');
+$router = new Router;
+$router->respond('/group/topic/[:id]', array('Group\Topic', 'view'));
 ```
 
-所以，你需要在 `controller` 文件夹里加入一个 `group.php` 文件，作为 `group` 的控制器。
+这样就新建了一个路由规则，用户访问指定的网址时，服务器将会加载Group模块下的 TopicController 类，并调用 viewAction 方法。路由规则中的[:id] 代表参数，将会赋给Controller的同名属性。
+
+所以，你需要在 `controller` 文件夹里加入一个 `Group` 文件夹，并在其下新建 `Topic.php` 文件。
 
 在这个文件里，你需要定义一个类：
 
 ```php
-class GroupController extends BasicController
+class TopicController extends Controller
 {
-    public function topic($topicId) // $topicId === '35708257'
+    public function viewAction() 
     {
         // 获取数据
+        $topicId = $this->id; // $topicId === '35708257'
         // ...
 
         // 渲染视图
-        render_view('master');
+        $this->renderView('master');
     }
 }
 ```
@@ -120,28 +136,32 @@ CREATE TABLE `topic` (
 那么我们如何获取数据呢？这个样子就可以了：
 
 ```php
-public function topic($topicId)
+public function viewAction() 
 {
     // 获取数据
-    $topic = new Topic($topicId);
+    $topicId = $this->id; // $topicId === '35708257'
+    $topic = Topic::findOne($topicId);
     echo $topic->title;
 }
 ```
 
-`$topic->title` 就是标题，而 `$topic->content` 自然就是内容啦。很简单吧。不过，要想实现这种用面向对象的方式访问数据库，我们首先要写好 Model 层。也就是传说中的 ORM 啦。
+`$topic->title` 就是标题，而 `$topic->content` 自然就是内容啦。很简单吧。不过，要想实现这种用面向对象的方式访问数据库，我们首先要写好 Model 层。也就是传说中的 ORM ，也有人叫做 AR。
 
-在 `model` 文件夹里新建一个 `Topic.php` 文件。注意，这个类的名称一定要是表名首字母大写（不这样也可以，但你就得多写一行代码）。
+在 `model` 文件夹里新建一个 `Topic.php`文件。注意，这个类的名称一定要是表名首字母大写。
 内容如下：
 
 ```php
-class Topic extends BasicModel // 继承自 BasicModel，这是重点！
+class Topic extends IdModel // 继承自 IdModel，这是重点！
 {
 }
 ```
 
-现在你就拥有一个最基本的 ORM 了。上面的 `group` 中的 `topic` 方法。已经可以工作了。
+现在你就拥有一个最基本的 ORM 了。上面的 `viewAction` 方法。已经可以工作了。
 
 render
+```php
+
+```
 
 ** ORM 进阶 **
 
@@ -207,9 +227,10 @@ class Topic extends BasicModel
 不过，你肯定很好奇见证奇迹的代码是如何工作的。我来一步步的讲解一下吧。
 
 ```php
-$searcher = Model::search();        // 这是一个搜索者，专门用来获取数据库中的数据。
-$searcher->filterBy('key', $value); // 指定一个 filter（过滤器）
-$data = $searcher->find();          // 使用 `Searcher::find()` 方法获取数据
+$data =
+    Model::search();        // 这是一个搜索者，专门用来获取数据库中的数据。
+    ->filterBy('key', $value); // 指定一个 filter（过滤器）
+    ->findMany();          // 使用 `Searcher::findMany()` 方法获取数据
 ```
 
 首先看网址：
@@ -255,11 +276,5 @@ function _req($name);
 更多的思考
 -----------
 
-最近看了好多的框架。
-
-原来 Java 考虑的好全面啊。
-
-如何用好ORM？ORM和高效是否背道而驰？
-
-还是得写ORM。
+Java 中的DAO和Entity，被我用动态方法和静态方法区分了。
 
