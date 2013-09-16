@@ -109,6 +109,9 @@ class Searcher
     public function whereEqual($key, $value)
     {
         $key = self::backQuote($key);
+        if (is_object($value)) {
+            $value = $value->{$value::pkey()};
+        }
         $this->wheres[] = array("$key = ?", array($value));
     }
 
