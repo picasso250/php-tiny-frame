@@ -218,7 +218,7 @@ class Topic extends BasicModel
 {
     public function comments()
     {
-        return Comment::search()->where('topic', $this)->find(); // 这就是见证奇迹的代码
+        return Comment::search()->where('topic', $this)->findMany(); // 这就是见证奇迹的代码
     }
 }
 ```
@@ -239,11 +239,11 @@ $data =
 /app_core/function.php 中有一些常用函数：
 
 ```php
-function _get($name);
+function _get($name); // 相当于 $_GET[$name]
 
-function _post($name);
+function _post($name); // 相当于 $_POST[$name]
 
-function _req($name);
+function _req($name); // 相当于 $_REQUEST[$name]
 ```
 
 类库

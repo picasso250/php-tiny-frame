@@ -299,5 +299,4 @@ class Searcher
         $this->limit = null;
         $this->offset = null;
     }
-
 }
