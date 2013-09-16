@@ -9,6 +9,7 @@ class PdoWrapper
     protected static $config = array(
         'debug' => false,
     );
+    protected static $sqls = array();
 
     /**
      * 配置
@@ -34,9 +35,135 @@ class PdoWrapper
     {
     }
 
-    protected static function update()
+    /**
+     * 插入
+     * 
+     * 对应 sql 中的 insert 语句
+     */
+    public function insert($table, $data) 
     {
-        $self = get_called_class();
-        return new $self();
+        $keys = array_keys($data);
+        $keys .= implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
+        $values .= implode(', ', array_map(function ($k) {return ":$k";}, $keys));
+        $sql = "INSERT INTO `$table` ($keys) VALUES ($values)";
+        $statement = self::execute($sql, $data);
+        return $statement->rowCount();
+    }
+
+    /**
+     * 更新
+     * 
+     * 对应sql中的update语句
+     * @example update($set, $where)
+     */
+    public function update($table, $data, $whereStr = '', $whereVals = array())
+    {
+        $set = array();
+        $values = array();
+        foreach ($data as $key => $value) {
+            if (is_int($key)) {
+                $set[] = $value;
+            } else {
+                $set[] = "`$key` = ?";
+                $values[] = $value;
+            }
+        }
+        $set = implode(', ', $set);
+
+        $sql = "UPDATE $table SET $set"
+        if ($whereStr) {
+            $sql .= " WHERE $whereStr";
+        }
+        
+        $values = array_merge($values, $whereVals);
+
+        $statement = self::execute($sql, $values);
+        return $statement->rowCount();
+    }
+
+    /**
+     * 相当于 sql 中的 DELETE
+     * 
+     * @param string $id
+     */
+    public function delete($whereStr = '', $whereVals = array()) {
+
+        $sql = "DELETE FROM `$table()`";
+        if ($whereStr) {
+            $sql .= " WHERE $whereStr";
+        }
+
+        $statement = self::execute($sql, $whereVals);
+        return $statement->rowCount();
+    }
+
+    /**
+     * 执行一条Sql语句
+     */
+    public static function execute($sql, $args = array()) {
+        self::logSql($sql, $args);
+
+        $db = static::db();
+        $statement = $db->prepare($sql);
+        static::bindValues($statement, $args);
+        $rs = $statement->execute();
+        if (!$rs) {
+            if (static::$config['debug']) {
+                var_dump($statement);
+                var_dump($statement->errorInfo());
+            }
+            throw new Exception("db error: " . $statement->errorCode(), 1);
+        }
+
+        return $statement;
+    }
+
+    protected static function logSql($sql, $args = array())
+    {
+        if ($args) {
+            if (is_int(key($args))) {
+                $sql = str_replace('?', '%s', $sql);
+                $args = array_map(function ($p) {return "'$p'";}, array_values($args));
+                array_unshift($args, $sql);
+                $sql = call_user_func_array('sprintf', $args);
+            } else {
+                foreach ($args as $key => $value) {
+                    $sql = preg_replace('/:'.$key.'\b/', "'$value'", $sql);
+                }
+            }
+        }
+        self::$sqls[] = $sql;
+
+        $logger = LoggerFactory::getLogger(get_called_class());
+        $logger->debug($sql);
+    }
+
+    /**
+     * get last sql executed
+     */
+    public static function lastSql()
+    {
+        return self::$sqls[count(self::$sqls) - 1];
+    }
+
+    /**
+     * get logs array
+     */
+    public static function sqlLog()
+    {
+        return self::$sqls;
+    }
+
+    /**
+     * 绑定参数
+     */
+    protected static function bindValues($statement, $args) {
+        foreach ($args as $key => $value) {
+            if (is_int($key)) {
+                $statement->bindValue($key + 1, $value); // for ?
+            } else {
+                $statement->bindValue($key, $value); // for :param
+            }
+        }
     }
 }
