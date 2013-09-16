@@ -5,7 +5,6 @@
  */
 class PtfApp
 {
-
     function init()
     {
         ob_start();
@@ -42,10 +41,4 @@ class PtfApp
             return $call($param);
         }
     }
-}
-
-function render_view($view_file, $opts = array())
-{
-    extract($opts);
-    include AppFile::view($view_file); // 渲染 view
 }

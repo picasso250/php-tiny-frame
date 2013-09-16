@@ -165,7 +165,7 @@ render
 
 ** ORM 进阶 **
 
-你把这个 豆瓣小组 交付之后，主管很严肃的过来找你谈心，他说你这里有个重要的功能还没做，那就是回复功能。于是你开始思考回复功能怎么做。
+以回复功能为例：
 
 首先构建出数据库：
 
@@ -218,7 +218,7 @@ class Topic extends BasicModel
 {
     public function comments()
     {
-        return Comment::search()->filterBy('topic', $this)->find(); // 这就是见证奇迹的代码
+        return Comment::search()->where('topic', $this)->find(); // 这就是见证奇迹的代码
     }
 }
 ```
@@ -228,16 +228,10 @@ class Topic extends BasicModel
 
 ```php
 $data =
-    Model::search();        // 这是一个搜索者，专门用来获取数据库中的数据。
-    ->filterBy('key', $value); // 指定一个 filter（过滤器）
-    ->findMany();          // 使用 `Searcher::findMany()` 方法获取数据
+    Model::search()        // 这是一个搜索者，专门用来获取数据库中的数据。
+    ->where('key', $value) // 指定搜索条件
+    ->findMany()           // 使用 `Searcher::findMany()` 方法获取数据
 ```
-
-首先看网址：
-
-`/group/reply/35708257/`
-
-当然，真实的豆瓣不是这个网址，为了更加适应 ptf 框架，所以我这个样子设计网址。
 
 常用函数
 --------
