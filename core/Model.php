@@ -48,6 +48,6 @@ class Model
 
     public static function search()
     {
-        return new Searcher(static::table());
+        return new Searcher(get_called_class());
     }
 }
