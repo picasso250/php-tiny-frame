@@ -404,6 +404,87 @@ $people = Model::fetchMany('SELECT p.* FROM person p JOIN role r ON p.role_id = 
 
 返回的依然是包含这个类的实例的数组。
 
+模型
+
+从对象中获取数据
+
+取得了对象（记录）之后，你就可以通过访问对象的属性来获取数据了。可以使用get方法，或者直接访问属性。
+
+$person = ORM::for_table('person')->find_one(5);
+
+// 以下两种方式等同
+$name = $person->get('name');
+$name = $person->name;
+
+你也可以通过toArray方法将数据转化为数组。
+
+toArray方法拿字段名作为（可选的）参数，如果提供字段名（一个或多个），那么只有指定的字段才会被返回。
+
+$person = ORM::for_table('person')->create();
+
+$person->first_name = 'Fred';
+$person->surname = 'Bloggs';
+$person->age = 50;
+
+// 返回 array('first_name' => 'Fred', 'surname' => 'Bloggs', 'age' => 50)
+$data = $person->as_array();
+
+// 返回 array('first_name' => 'Fred', 'age' => 50)
+$data = $person->as_array('first_name', 'age');
+
+更新记录
+
+改变对象的属性，然后调用对象的save方法。
+改变对象属性可以用set方法，也可以直接对属性赋值。给set方法传数组参数也可以一次改动多处属性。
+
+$person = ORM::for_table('person')->find_one(5);
+
+// 以下两种形式等同
+$person->set('name', 'Bob Smith');
+$person->age = 20;
+
+// 下面和两次赋值等同
+$person->set(array(
+    'name' => 'Bob Smith',
+    'age'  => 20
+));
+
+// 与数据库同步
+$person->save();
+
+包含表达式的属性
+
+通过setExpr方法可以设置SQL表达式。
+
+$person = ORM::for_table('person')->find_one(5);
+$person->set('name', 'Bob Smith');
+$person->age = 20;
+$person->set_expr('updated', 'NOW()');
+$person->save();
+
+创建新记录
+首先，需要创建一个空对象，然后像平常一样给属性赋值，最后保存之。
+
+$person = ORM::for_table('person')->create();
+
+$person->name = 'Joe Bloggs';
+$person->age = 40;
+
+$person->save();
+
+保存对象之后，调用id方法能够得到数据库给它的自增id的值。
+
+删除记录
+只要简单调用delete方法就可以从数据库中删除对象。
+
+$person = ORM::for_table('person')->find_one(5);
+$person->delete();
+如果想删除不止一条记录，调用searcher的delete方法。
+
+$person = ORM::for_table('person')
+    ->where_equal('zipcode', 55555)
+    ->delete_many();
+
 常用函数
 --------
 
