@@ -58,6 +58,11 @@ class IdModel extends Model
             return $defaultPrimaryKey;
     }
 
+    public function id()
+    {
+        return $this->row[static::pkey()];
+    }
+
     public function set()
     {
         $num = func_num_args();
