@@ -293,6 +293,26 @@ class Searcher
 
     public function join($table, $on, $columns = null)
     {
+        return $this->_join('JOIN', $table, $on, $columns);
+    }
+
+    public function leftJoin($table, $on, $columns = null)
+    {
+        return $this->_join('LEFT JOIN', $table, $on, $columns);
+    }
+
+    public function rightJoin($table, $on, $columns = null)
+    {
+        return $this->_join('RIGHT JOIN', $table, $on, $columns);
+    }
+
+    public function fullJoin($table, $on, $columns = null)
+    {
+        return $this->_join('OUT JOIN', $table, $on, $columns);
+    }
+
+    private function _join($method, $table, $on, $columns = null)
+    {
         if (is_string($table)) {
             $join = "`$table`";
             $ti = $table;
@@ -316,7 +336,7 @@ class Searcher
         if ($columns) {
             $this->joinColumns($columns, $ti);
         }
-        $join .= "join $table $on";
+        $join .= "$method $table ON $on";
         $this->joins[] = $join;
         return $this;
     }
@@ -454,6 +474,41 @@ class Searcher
         return PdoWrapper::delete($this->table, $whereStr, $whereVals);
     }
 
+    protected function buildSelectSql() {
+        $field = $this->buildColumns();
+        $table = $this->buildTable();
+        list($where, $whereVals) = $this->buildWhere();
+        list($having, $havingVals) = $this->buildHaving();
+        $join = implode(' ', $this->joins);
+        $groupBy = implode(', ', $this->groupbys);
+        $orderBy = implode(', ', $this->orderbys);
+        $limit = $this->limit === null ? '' : " LIMIT $this->limit";
+        $offset = $this->offset === null ? '' : " OFFSET $this->offset";
+        $sql = "SELECT"
+                . ($this->distinct ? ' DISTINCT' : '')
+                . " $field FROM $table"
+                . ($where ? " $where" : '')
+                . ($join ? " $join" : '')
+                . ($groupBy ? " GROUP BY $groupBy" : '')
+                . ($having ? " $having" : '')
+                . ($orderBy ? " ORDER BY $orderBy" : '')
+                . $limit . $offset;
+        $values = array_merge($whereVals, $havingVals);
+        return array($sql, $values);
+    }
+
+    private function buildColumns()
+    {
+        if ($this->count) {
+            $field = 'COUNT(*)';
+        } elseif (empty($this->columns)) {
+            $field = '*';
+        } else {
+            $field = implode(', ', $this->columns);
+        }
+        return $field;
+    }
+
     private function buildTable() {
         if ($this->table) {
             $t = self::backQuoteWord($this->table);
@@ -492,20 +547,6 @@ class Searcher
         }
         $str = implode(' AND ', $strs);
         return array($str, $values);
-    }
-
-    private function buildOrderBy() {
-        if ($this->orderbys) {
-            return 'ORDER BY ' . implode(',', $this->orderbys);
-        }
-        return '';
-    }
-
-    private function buildGroupBy() {
-        if ($this->groupbys) {
-            return 'GROUP BY ' . implode(',', $this->groupbys);
-        }
-        return '';
     }
 
     public static function backQuote($key) {
