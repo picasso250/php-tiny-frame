@@ -2,6 +2,8 @@
 
 namespace ptf;
 
+use \Pdo;
+
 /**
  * @author ryan
  */
@@ -119,7 +121,17 @@ class Searcher
     // where id in (3, 4, 5)
     public function whereIn($key, $value)
     {
-        // 支持=和in操作符
+        return $this->whereOpArray($key, 'IN', $value);
+    }
+
+    // where id not in (3, 4, 5)
+    public function whereNotIn($key, $value)
+    {
+        return $this->whereOpArray($key, 'NOT IN', $value);
+    }
+
+    protected function whereOpArray($key, $op, $arr)
+    {
         $key = self::backQuote($key);
         if (is_array($value)) {
             $placeholder = array_map(function ($e) {return '?';}, $value);
@@ -130,7 +142,8 @@ class Searcher
             $value = array($value);
         }
 
-        $this->wheres[] = array("$key in ($placeholder)", $value);
+        $this->wheres[] = array("$key $op ($placeholder)", $value);
+        return $this;
     }
 
     public function orderBy($exp)
@@ -163,9 +176,10 @@ class Searcher
         $this->limit(1);
         list($sql, $values) = $this->buildSelectSql();
         $statement = $this->execute($sql, $values);
-        $data = $statement->fetch(PDO::FETCH_OBJ);
+        $data = $statement->fetch(PDO::FETCH_ASOCC);
         if ($data) {
-            return $this->makeEntity($data);
+            $class = $this->class;
+            return $class::fromArray($data);
         }
         return null;
     }
@@ -180,10 +194,11 @@ class Searcher
         $statement = $this->execute($sql, $values);
 
         $rows = array();
-        while (($row = $statement->fetch(PDO::FETCH_OBJ)) !== false) {
-            $rows[] = $this->makeEntity($row);
+        while (($row = $statement->fetch(PDO::FETCH_ASOCC)) !== false) {
+            $class = $this->class;
+            $rows[] = $class::fromArray($row);
         }
-        return new ResultSet($rows);
+        return $rows;
     }
 
     public function makeEntity($row)

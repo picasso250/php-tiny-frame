@@ -23,9 +23,13 @@ class IdModel extends Model
         $pkey = static::pkey();
         $sql = "select from `$table` where `$pkey`=?";
         $row = self::fetchRow($sql, array($id), Pdo::FETCH_ASSOC);
-        $o = new $self();
-        $o->row = $row[$pkey];
-        $o->$row = $row;
+        return static::fromArray($row);
+    }
+
+    public static function fromArray($arr)
+    {
+        $o = parent::fromArray($arr);
+        $o->row = $row[static::pkey()];
         return $o;
     }
 

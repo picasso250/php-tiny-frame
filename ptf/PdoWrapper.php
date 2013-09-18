@@ -2,6 +2,9 @@
 
 namespace ptf;
 
+use \Pdo;
+use \Exception;
+
 /**
  * @author ryan
  */
@@ -10,6 +13,7 @@ class PdoWrapper
     protected static $instance;
     protected static $config = array(
         'debug' => false,
+        'logging' => false,
     );
     protected static $sqls = array();
 
@@ -21,7 +25,7 @@ class PdoWrapper
      * 或
      * array(key=>value,...)
      */
-    public function static config()
+    public static function config()
     {
         $num = func_num_args();
         if ($num == 1) {
@@ -35,6 +39,16 @@ class PdoWrapper
 
     protected function __construct()
     {
+    }
+
+    public static function getDb()
+    {
+        return self::$instance;
+    }
+
+    public static function setDb($db)
+    {
+        self::$instance = $db;
     }
 
     /**
@@ -72,7 +86,7 @@ class PdoWrapper
         }
         $set = implode(', ', $set);
 
-        $sql = "UPDATE $table SET $set"
+        $sql = "UPDATE $table SET $set";
         if ($whereStr) {
             $sql .= " WHERE $whereStr";
         }
@@ -123,7 +137,9 @@ class PdoWrapper
      * 执行一条Sql语句
      */
     public static function execute($sql, $args = array()) {
-        self::logSql($sql, $args);
+        if (self::$config['logging']) {
+            self::logSql($sql, $args);
+        }
 
         $db = static::db();
         $statement = $db->prepare($sql);
@@ -155,9 +171,6 @@ class PdoWrapper
             }
         }
         self::$sqls[] = $sql;
-
-        $logger = LoggerFactory::getLogger(get_called_class());
-        $logger->debug($sql);
     }
 
     /**

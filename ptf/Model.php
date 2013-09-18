@@ -21,6 +21,14 @@ class Model
         return new $self();
     }
 
+    public static function fromArray($arr)
+    {
+        $self = get_called_class();
+        $o = new $self();
+        $o->$row = $row;
+        return $o;
+    }
+
     public function toArray()
     {
         return $this->row();
