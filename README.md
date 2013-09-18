@@ -3,9 +3,9 @@ php-tiny-frame
 
 Very small framework for website write in PHP.
 
-一个小而简单的 PHP 框架。使用 MVC 模式。支持 SAE 。
+一个简单的 PHP 框架。使用 MVC 模式。支持 SAE 。
 
-（我猜很多 PHP 程序员都坐过这种事情，写了个小框架，然后慢慢放弃，转而使用别人的框架（比较大的）。或许这就是成长，没有小框架，要我们如何理解大框架？）
+（我猜很多 PHP 程序员都坐过这种事情，写了个小框架，然后慢慢放弃，转而使用别人的框架（比较大的）。或许这就是成长？）
 
 **我的目的**
 
@@ -17,24 +17,24 @@ Very small framework for website write in PHP.
 这个框架参考了
 - **鸡爷** 的自用框架，
 - [LazyPHP3](https://github.com/easychen/LazyPHP)
-- Idiorm
-- Klein
+- [Idiorm](http://j4mie.github.io/idiormandparis/)
+- [Klein](http://chriso.github.io/klein.php/)
+- [Zend FrameWork 2](http://framework.zend.com/)
+
 在此一并表示感谢。
 
 这个框架有如下特征：
 
 1. MVC 结构
-1. PDO 封装的 DB 访问类，杜绝 SQL 注入
-2. 模仿 [Idiorm](http://www.doctrine-project.org/) 的一个简单的 ORM
+2. ORM
 1. 使用 PHP 做 router
-1. 使用自己的 Test 库
 
 **这个框架还是极端的不成熟，不推荐日常使用。**
 
 文件结构
 ---------------
 
-根目录下的文件夹有如下：
+默认的根目录下的文件夹有如下：
 
 * ptf
 
@@ -52,9 +52,7 @@ Very small framework for website write in PHP.
 
  视图。模版都在里面。
 
-model 是类。
-
-所有的 Model 都可以继承了一个我已经写好的 BasicModel 类，里面有一些基本的增删改查的函数。
+所有的 Model 都需要继承 Model 类，里面有一些基本的增删改查的函数，可以更方便的和数据库交互。
 
 
 简明教程
@@ -227,120 +225,177 @@ class Topic extends BasicModel
 
 ```php
 $data =
-    Model::search()        // 这是一个搜索者，专门用来获取数据库中的数据。
+    Person::search()        // 这是一个搜索者，专门用来获取数据库中的数据。
     ->where('key', $value) // 指定搜索条件
     ->findMany()           // 使用 `Searcher::findMany()` 方法获取数据
 ```
 
-ORM配置
+ORM
+------
+
+**ORM 配置**
+
 ```php
 PdoWrapper::config('mysql:host=localhost;dbname=my_database');
 PdoWrapper::config('username', 'database_user');
 PdoWrapper::config('password', 'top_secret');
 ```
 还可以用config()方法设置一些其他的选项。
+
+```php
 PdoWrapper::config('选项名', '选项值');
+```
 
 还可以一次性传多个键值对：
+
+```php
 PdoWrapper::config(array(
     '选项名1' => '选项值1',
     '选项名2' => '选项值2',
     '等等' => '其他'
 ));
+```
 
-getConfig可以用来获取选项值
+`getConfig()` 可以用来获取选项值
 
-$isLoggingEnabled = ORM::getConfig('logging');
-ORM::configure('logging', false);
+```php
+$isLoggingEnabled = PdoWrapper::getConfig('logging');
+PdoWrapper::config('logging', false);
 // 全速循环，会产生超多sql，乃至你想要屏蔽日志
-ORM::configure('logging', $isLoggingEnabled);
+PdoWrapper::config('logging', $isLoggingEnabled);
+```
 
 有时候，有些数据库适配器允许指定自己的配置，比如mysql的中文，我们就可以这样：
-ORM::configure('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
 
-实际上，我们可以用getDb方法获取Pdo对象，也可以直接用setDb注入Pdo对象。当然，但愿你用不着这个功能。
+```php
+PdoWrapper::config('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
+```
+
+实际上，我们可以用 `getDb()` 方法获取 Pdo 对象，也可以直接用 `setDb()` 注入 Pdo 对象。当然，但愿你用不着这个功能。
 
 查询
 ----
 
 查询接口采用了“连贯接口”的设计模式，也就是通常所说的链式调用。
-当我们建立了对应的model之后，就可以进行查询了：
 
-Model::search()->where('name', 'Fred Bloggs')->findOne();
+首先需要我们建立model，假如表名为person，则我们建立的模型为
+
+```php
+//有主键的表，要继承 IdModel 类。
+class Person extends IdModel {} 
+```
+
+当我们建立了对应的模型之后，就可以进行查询了：
+
+```php
+Person::search()->where('name', 'Fred Bloggs')->findOne();
+```
 
 如果是想要找到某一个主键的一行记录。
-IdModel::findOne(5);
+
+```php
+Person::findOne(5);
+```
+
 上述语句找到了主键id为5的记录。
 
 注意，Model为是最基本的基类。IdModel是指有主键的。
 
-查找多个
-如果方法链以findMany结尾，即是找到多个。
+**查找多个**
+
+如果方法链以 `findMany()` 结尾，即是寻找多个。
 
 找到所有记录：
-$people = ORM::for_table('person')->find_many();
+
+```php
+$people = Person::search()->findMany();
+```
 
 找到性别为女的记录
-$females = Model::search()->where('gender', '女')->findMany();
+
+```php
+$females = Person::search()->where('gender', '女')->findMany();
+```
 
 默认返回的是一个Model对象，如果想要返回关联数组，则
-$females = Model::search()->where('gender', '女')->findArray();
+
+```php
+$females = Person::search()->where('gender', '女')->findArray();
+```
 
 如果想要其他的比较符号，可以使用三个参数的where方法：
-$females = Model::search()->where('age', '!=', 23)->findMany();
 
-度量
+```php
+$people = Person::search()->where('age', '!=', 23)->findMany();
+```
+
+**度量**
 
 要想知道记录的数量，可以使用count方法
 
-$number_of_people = ORM::for_table('person')->count();
+```php
+$number_of_people = Person::search()->count();
+```
 
-过滤结果集
+**过滤结果集**
 
 where族方法提供了丰富的过滤机制：
-比如调用where('name', 'Fred')会产生 WHERE name = "Fred"
-相当于调用whereEqual
+比如调用 `where('name', 'Fred')` 会产生 `WHERE name = "Fred"` ，
+相当于调用 `whereEqual()`
 
-想要 WHERE ... IN () 或 WHERE ... NOT IN () 语句, 使用 whereIn 或 whereNotIn 方法。
+想要 `WHERE ... IN ()` 或 `WHERE ... NOT IN ()` 语句, 使用 `whereIn()` 或 `whereNotIn()` 方法。
 这两个方法接受两个参数。第一个是字段名，第二个是数组
-$people = ORM::for_table('person')->where_in('name', array('Fred', 'Joe', 'John'))->find_many();
 
-原生表达式
+```php
+$people = Person::search()->whereIn('name', array('Fred', 'Joe', 'John'))->findMany();
+```
 
-如果你需要更复杂的查询，你可以使用whereExpr方法，直接指定SQL表达式片段。
+**原生表达式**
+
+如果你需要更复杂的查询，你可以使用 `whereExpr()` 方法，直接指定SQL表达式片段。
 这个方法接受两个参数，一个SQL字符串，另一个（可选）是参数数组，用于绑定到SQL上。如果参数数组提供了，SQL字符串中可以包含?，以待绑定。注意顺序。
 
 这个方法可以和其他的 where* 方法
 及其他方法如 orderBy方法。所有使用过的where方法将会用AND连接起来。
-$people = ORM::for_table('person')
+
+```php
+$people = Person::search()
             ->where('name', 'Fred')
-            ->where_raw('(`age` = ? OR `age` = ?)', array(20, 25))
-            ->order_by_asc('name')
-            ->find_many();
+            ->whereRaw('(`age` = ? OR `age` = ?)', array(20, 25))
+            ->orderBy('name', 'asc')
+            ->findMany();
 
 // Creates SQL:
 SELECT * FROM `person` WHERE `name` = "Fred" AND (`age` = 20 OR `age` = 25) ORDER BY `name` ASC;
+```
+
 注意这个方法只支持问号作为占位符，不支持带名字的占位符。这是因为Pdo不允许混杂的占位符模式。再次强调，占位符的顺序和参数的顺序需要匹配。
 
-如果你需要更大的灵活性，可以使用excute方法指定整个查询。
+如果你需要更大的灵活性，可以使用 `excute()` 方法指定整个查询。
 
 数量和偏移
 
 注意此方法不过滤字符，所以不要直接使用用户输入入参。
 
-$people = ORM::for_table('person')->where('gender', 'female')->limit(5)->offset(10)->find_many();
+```php
+$people = Person::search()->where('gender', 'female')->limit(5)->offset(10)->findMany();
+```
 
-排序
+**排序**
 
 注意此方法不过滤字符，所以不要直接使用用户输入入参。
 
 orderBy()方法接受两个参数，字段名和排序方式。字段名将被括起来。
 
-$people = ORM::for_table('person')->orderBy('gender', 'asc')->orderBy('name', 'DESC')->findMany();
+```php
+$people = Person::search()->orderBy('gender', 'asc')->orderBy('name', 'DESC')->findMany();
+```
 
 如果需要更复杂的排序方式，也可以直接传一个表达式到这个方法里。
 
-$people = ORM::for_table('person')->orderBy('SOUNDEX(`name`)')->find_many();
+```php
+$people = Person::search()->orderBy('SOUNDEX(`name`)')->findMany();
+```
 
 分组
 
@@ -348,27 +403,37 @@ $people = ORM::for_table('person')->orderBy('SOUNDEX(`name`)')->find_many();
 
 添加 GROUP BY 字句，使用groubBy方法，传入字段名。此方法可以被多次调用，以便多列分组。
 
-$people = ORM::for_table('person')->where('gender', 'female')->group_by('name')->find_many();
+```php
+$people = Person::search()->where('gender', 'female')->groupBy('name')->findMany();
+```
 
 使用表达式来分组也是可以的。
 
-$people = ORM::for_table('person')->where('gender', 'female')->groupBy("FROM_UNIXTIME(`time`, '%Y-%m')")->find_many();
+```php
+$people = Person::search()->where('gender', 'female')->groupBy("FROM_UNIXTIME(`time`, '%Y-%m')")->findMany();
+```
 
 Having
 
 当和 GROUP BY 结合查询一些需经过计算的条件时，你可以使用 HAVING 字句。只需要把where替换成having就行。
 
-$people = ORM::for_table('person')->group_by('name')->having_not_like('name', '%bob%')->find_many();
+```php
+$people = Person::search()->groupBy('name')->having_not_like('name', '%bob%')->findMany();
+```
 
 DISTINCT
 
-$distinct_names = ORM::for_table('person')->distinct()->select('name')->find_many();
+```php
+$distinct_names = Person::search()->distinct()->select('name')->findMany();
+```
 
 生成的sql语句如下：
 
+```
 SELECT DISTINCT `name` FROM `person`;
+```
 
-连接
+**连接**
 
 ptf有一族连接函数：
 join, leftJoin, rightJoin, fullJoin.
@@ -377,24 +442,27 @@ join, leftJoin, rightJoin, fullJoin.
 
 前两个参数是必须的。第一个参数是要连接的表名，第二个参数是连接条件。推荐使用三元数组指定连接条件：字段名、操作符、字段名。表名和字段名会被自动括起来。
 
-$results = ORM::for_table('person')->join('person_profile', array('person.id', '=', 'person_profile.person_id'))->find_many();
+```php
+$results = Person::search()->join('person_profile', array('person.id', '=', 'person_profile.person_id'))->findMany();
+```
 
 用字符串作为链接条件也是可以的。
 
-<?php
-// Not recommended because the join condition will not be escaped.
-$results = ORM::for_table('person')->join('person_profile', 'person.id = person_profile.person_id')->find_many();
+```php
+// 不推荐，因为字段名不会被反引
+$results = Person::search()->join('person_profile', 'person.id = person_profile.person_id')->findMany();
+```
 
 如果想为被连接的表指定别名，在表名处传入一个长度为1的数组，键为原表名，值为别名。这在连接自身的时候会非常有用。
 
 连接方法还有第三个可选参数，可以是数组或者字符串，指定要选择的列。和columns方法参数一致。
 
-$results = ORM::for_table('person')
+$results = Person::search()
     ->table_alias('p1')
     ->select('p1.*')
     ->select('p2.name', 'parent_name')
     ->join(array('person' => 'p2'), array('p1.parent', '=', 'p2.id'))
-    ->find_many();
+    ->findMany();
 
 原生查询
 
@@ -410,7 +478,7 @@ $people = Model::fetchMany('SELECT p.* FROM person p JOIN role r ON p.role_id = 
 
 取得了对象（记录）之后，你就可以通过访问对象的属性来获取数据了。可以使用get方法，或者直接访问属性。
 
-$person = ORM::for_table('person')->find_one(5);
+$person = ORM::for_table('person')->findOne(5);
 
 // 以下两种方式等同
 $name = $person->get('name');
@@ -437,7 +505,7 @@ $data = $person->as_array('first_name', 'age');
 改变对象的属性，然后调用对象的save方法。
 改变对象属性可以用set方法，也可以直接对属性赋值。给set方法传数组参数也可以一次改动多处属性。
 
-$person = ORM::for_table('person')->find_one(5);
+$person = ORM::for_table('person')->findOne(5);
 
 // 以下两种形式等同
 $person->set('name', 'Bob Smith');
@@ -456,7 +524,7 @@ $person->save();
 
 通过setExpr方法可以设置SQL表达式。
 
-$person = ORM::for_table('person')->find_one(5);
+$person = ORM::for_table('person')->findOne(5);
 $person->set('name', 'Bob Smith');
 $person->age = 20;
 $person->set_expr('updated', 'NOW()');
@@ -477,12 +545,12 @@ $person->save();
 删除记录
 只要简单调用delete方法就可以从数据库中删除对象。
 
-$person = ORM::for_table('person')->find_one(5);
+$person = ORM::for_table('person')->findOne(5);
 $person->delete();
 如果想删除不止一条记录，调用searcher的delete方法。
 
 $person = ORM::for_table('person')
-    ->where_equal('zipcode', 55555)
+    ->whereEqual('zipcode', 55555)
     ->delete_many();
 
 常用函数
