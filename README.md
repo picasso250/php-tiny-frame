@@ -271,14 +271,13 @@ PdoWrapper::config('logging', $isLoggingEnabled);
 PdoWrapper::config('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
 ```
 
-实际上，我们可以用 `getDb()` 方法获取 Pdo 对象，也可以直接用 `setDb()` 注入 Pdo 对象。当然，但愿你用不着这个功能。
+实际上，可以用 `getDb()` 方法获取 Pdo 对象，也可以直接用 `setDb()` 注入 Pdo 对象。当然，但愿你用不着这个功能。
 
-查询
-----
+**查询**
 
 查询接口采用了“连贯接口”的设计模式，也就是通常所说的链式调用。
 
-首先需要我们建立model，假如表名为person，则我们建立的模型为
+首先需要我们建立模型，假如表名为 `person` ，则我们建立的模型为
 
 ```php
 //有主键的表，要继承 IdModel 类。
@@ -291,7 +290,7 @@ class Person extends IdModel {}
 Person::search()->where('name', 'Fred Bloggs')->findOne();
 ```
 
-如果是想要找到某一个主键的一行记录。
+如果是想要找到对应某一个主键的一行记录。
 
 ```php
 Person::findOne(5);
@@ -299,7 +298,7 @@ Person::findOne(5);
 
 上述语句找到了主键id为5的记录。
 
-注意，Model为是最基本的基类。IdModel是指有主键的。
+注意， `Model` 为是所有模型的基类。 `IdModel` 是指有主键的。
 
 **查找多个**
 
@@ -343,7 +342,7 @@ where族方法提供了丰富的过滤机制：
 比如调用 `where('name', 'Fred')` 会产生 `WHERE name = "Fred"` ，
 相当于调用 `whereEqual()`
 
-想要 `WHERE ... IN ()` 或 `WHERE ... NOT IN ()` 语句, 使用 `whereIn()` 或 `whereNotIn()` 方法。
+想要使用 `WHERE ... IN ()` 或 `WHERE ... NOT IN ()` 语句, 使用 `whereIn()` 或 `whereNotIn()` 方法。
 这两个方法接受两个参数。第一个是字段名，第二个是数组
 
 ```php
@@ -353,15 +352,14 @@ $people = Person::search()->whereIn('name', array('Fred', 'Joe', 'John'))->findM
 **原生表达式**
 
 如果你需要更复杂的查询，你可以使用 `whereExpr()` 方法，直接指定SQL表达式片段。
-这个方法接受两个参数，一个SQL字符串，另一个（可选）是参数数组，用于绑定到SQL上。如果参数数组提供了，SQL字符串中可以包含?，以待绑定。注意顺序。
+这个方法接受两个参数，一个SQL字符串，另一个（可选）是参数数组，用于绑定到SQL上。如果提供了参数数组，SQL字符串中可以包含 `?` ，以待绑定。注意参数的顺序，是顺次和 `?` 绑定的。
 
-这个方法可以和其他的 where* 方法
-及其他方法如 orderBy方法。所有使用过的where方法将会用AND连接起来。
+这个方法可以和其他的 where 族方法及其他方法如 `orderBy()` 方法混用。所有使用过的where方法的语句将会用 `AND` 连接起来。
 
 ```php
 $people = Person::search()
             ->where('name', 'Fred')
-            ->whereRaw('(`age` = ? OR `age` = ?)', array(20, 25))
+            ->whereRaw('`age` = ? OR `age` = ?', array(20, 25))
             ->orderBy('name', 'asc')
             ->findMany();
 
@@ -369,7 +367,7 @@ $people = Person::search()
 SELECT * FROM `person` WHERE `name` = "Fred" AND (`age` = 20 OR `age` = 25) ORDER BY `name` ASC;
 ```
 
-注意这个方法只支持问号作为占位符，不支持带名字的占位符。这是因为Pdo不允许混杂的占位符模式。再次强调，占位符的顺序和参数的顺序需要匹配。
+注意这个方法只支持问号 `?` 作为占位符，不支持带名字的占位符。这是因为 Pdo 不允许混杂的占位符模式。再次强调，占位符的顺序和参数的顺序需要匹配。
 
 如果你需要更大的灵活性，可以使用 `excute()` 方法指定整个查询。
 

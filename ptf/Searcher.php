@@ -431,15 +431,22 @@ class Searcher
      * 对应 select * from t
      */
     public function findMany() {
-        list($sql, $values) = $this->buildSelectSql();
-        $statement = $this->execute($sql, $values);
-
         $rows = array();
-        while (($row = $statement->fetch(Pdo::FETCH_ASOCC)) !== false) {
+        foreach ($this->findArray() as $key => $value) {
             $class = $this->class;
-            $rows[] = $class::fromArray($row);
+            $o = $class::fromArray($value);
+            if ($o instanceof IdModel) {
+                $rows[$o->id()] = $o;
+            } else {
+                $rows[] = $o;
+            }
         }
         return $rows;
+    }
+
+    public function findArray() {
+        list($sql, $values) = $this->buildSelectSql();
+        return PdoWrapper::fetchAll($sql, $values);
     }
 
     public function makeEntity($row)
