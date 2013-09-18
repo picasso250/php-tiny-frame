@@ -30,6 +30,32 @@ class Searcher
         $this->initBuilds();
     }
 
+    public function columns()
+    {
+        $num_args = func_num_args();
+        if ($num_args == 1) {
+            foreach (func_get_arg(0) as $key => $value) {
+                if (is_int($key)) {
+                    $this->columns[] = self::backQuote($value);
+                } else {
+                    $this->columns[] = "`$key` AS `$value`";
+                }
+            }
+        }
+    }
+
+    public function column()
+    {
+        $num_args = func_num_args();
+        if ($num_args == 1) {
+            $this->columns[] = self::backQuote(func_get_arg(0));
+        } elseif ($num_args == 2) {
+            $column = self::backQuote(func_get_arg(0));
+            $alias = self::backQuoteWord(func_get_arg(1));
+            $this->columns[] = "$column AS $alias";
+        }
+    }
+
     /**
      * 对应sql中的where
      * 
@@ -487,8 +513,8 @@ class Searcher
         $sql = "SELECT"
                 . ($this->distinct ? ' DISTINCT' : '')
                 . " $field FROM $table"
-                . ($where ? " $where" : '')
                 . ($join ? " $join" : '')
+                . ($where ? " $where" : '')
                 . ($groupBy ? " GROUP BY $groupBy" : '')
                 . ($having ? " $having" : '')
                 . ($orderBy ? " ORDER BY $orderBy" : '')
