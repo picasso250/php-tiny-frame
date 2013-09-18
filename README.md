@@ -371,7 +371,7 @@ SELECT * FROM `person` WHERE `name` = "Fred" AND (`age` = 20 OR `age` = 25) ORDE
 
 如果你需要更大的灵活性，可以使用 `excute()` 方法指定整个查询。
 
-数量和偏移
+**数量和偏移**
 
 注意此方法不过滤字符，所以不要直接使用用户输入入参。
 
@@ -395,7 +395,7 @@ $people = Person::search()->orderBy('gender', 'asc')->orderBy('name', 'DESC')->f
 $people = Person::search()->orderBy('SOUNDEX(`name`)')->findMany();
 ```
 
-分组
+**分组**
 
 注意此方法不过滤字符，所以不要直接使用用户输入入参。
 
@@ -411,7 +411,7 @@ $people = Person::search()->where('gender', 'female')->groupBy('name')->findMany
 $people = Person::search()->where('gender', 'female')->groupBy("FROM_UNIXTIME(`time`, '%Y-%m')")->findMany();
 ```
 
-Having
+**Having**
 
 当和 GROUP BY 结合查询一些需经过计算的条件时，你可以使用 HAVING 字句。只需要把where替换成having就行。
 
@@ -419,7 +419,7 @@ Having
 $people = Person::search()->groupBy('name')->having_not_like('name', '%bob%')->findMany();
 ```
 
-DISTINCT
+**DISTINCT**
 
 ```php
 $distinct_names = Person::search()->distinct()->select('name')->findMany();
@@ -427,28 +427,32 @@ $distinct_names = Person::search()->distinct()->select('name')->findMany();
 
 生成的sql语句如下：
 
-```
+```sql
 SELECT DISTINCT `name` FROM `person`;
 ```
 
 **连接**
 
 ptf有一族连接函数：
-join, leftJoin, rightJoin, fullJoin.
+`join()`, `leftJoin()`, `rightJoin()`, `fullJoin()`.
 
 每个方法都有相同的入参。
 
 前两个参数是必须的。第一个参数是要连接的表名，第二个参数是连接条件。推荐使用三元数组指定连接条件：字段名、操作符、字段名。表名和字段名会被自动括起来。
 
 ```php
-$results = Person::search()->join('person_profile', array('person.id', '=', 'person_profile.person_id'))->findMany();
+$results = Person::search()
+    ->join('person_profile', array('person.id', '=', 'person_profile.person_id'))
+    ->findMany();
 ```
 
 用字符串作为链接条件也是可以的。
 
 ```php
 // 不推荐，因为字段名不会被反引用
-$results = Person::search()->join('person_profile', 'person.id = person_profile.person_id')->findMany();
+$results = Person::search()
+    ->join('person_profile', 'person.id = person_profile.person_id')
+    ->findMany();
 ```
 
 如果想为被连接的表指定别名，在表名处传入一个长度为1的数组，键为原表名，值为别名。这在连接自身的时候会非常有用。
@@ -464,9 +468,9 @@ $results = Person::search()
     ->findMany();
 ```
 
-原生查询
+**原生查询**
 
-如果你想完成更复杂的查询，你可以指定整个sql表达式。excute方法需要一个字符串和（可选的）一个参数数组。字符串可以要送问号占位符，也可以用名称占位。如果你想要获取数据，那么使用fetchMany和fetchOne方法。
+如果你想完成更复杂的查询，你可以指定整个sql表达式。excute方法需要一个字符串和（可选的）一个参数数组。字符串可以要送问号占位符，也可以用名称占位。如果你想要获取数据，那么使用 `fetchMany()` 和 `fetchOne()` 方法。
 
 ```php
 $people = Model::fetchMany('SELECT p.* FROM person p JOIN role r ON p.role_id = r.id WHERE r.name = :role', array('role' => 'janitor'));
@@ -488,9 +492,9 @@ $name = $person->get('name');
 $name = $person->name;
 ```
 
-你也可以通过toArray方法将数据转化为数组。
+你也可以通过 `toArray()` 方法将数据转化为数组。
 
-toArray方法拿字段名作为（可选的）参数，如果提供字段名（一个或多个），那么只有指定的字段才会被返回。
+`toArray()` 方法拿字段名作为（可选的）参数，如果提供字段名（一个或多个），那么只有指定的字段才会被返回。
 
 ```php
 $person = ORM::for_table('person')->create();
