@@ -439,6 +439,21 @@ class Searcher
         return $this;
     }
 
+    public function update($set)
+    {
+        if ($set) {
+            list($whereStr, $whereVals) = $this->buildWhere();
+            return PdoWrapper::update($this->table, $set, $whereStr, $whereVals);
+        }
+        return 0;
+    }
+
+    public function delete()
+    {
+        list($whereStr, $whereVals) = $this->buildWhere();
+        return PdoWrapper::delete($this->table, $whereStr, $whereVals);
+    }
+
     private function buildTable() {
         if ($this->table) {
             $t = self::backQuoteWord($this->table);

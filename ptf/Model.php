@@ -10,7 +10,7 @@ class Model
     protected static $table;
     
     protected $row;
-    
+
     public function __construct()
     {
     }
@@ -31,7 +31,7 @@ class Model
 
     public function toArray()
     {
-        return $this->row();
+        return $this->row;
     }
 
     public static function table()

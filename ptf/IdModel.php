@@ -11,6 +11,8 @@ class IdModel extends Model
 
     protected $id;
 
+    protected $dirty;
+
     public static function create()
     {
         $self = get_called_class();
@@ -78,6 +80,8 @@ class IdModel extends Model
         } else {
             $this->update();
         }
+        $thsi->dirty = array();
+        return $this;
     }
 
     public function insert()
