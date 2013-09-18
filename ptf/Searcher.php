@@ -291,6 +291,69 @@ class Searcher
         return $this;
     }
 
+    public function join($table, $on, $columns = null)
+    {
+        if (is_string($table)) {
+            $join = "`$table`";
+            $ti = $table;
+        } elseif (is_array($table)) {
+            $a = reset($table);
+            $ti = key($table);
+            $join = "`$ti` AS `$a`";
+        }
+
+        if (is_array($on)) {
+            $n = count($on);
+            if ($n == 2) {
+                $c1 = $on[0];
+                $c2 = $on[1];
+                $on = "`$c1` = `$c2`";
+            } elseif ($n == 3) {
+                $on = "`$on[0]` $on[1] `$on[2]`";
+            }
+        }
+
+        if ($columns) {
+            $this->joinColumns($columns, $ti);
+        }
+        $join .= "join $table $on";
+        $this->joins[] = $join;
+        return $this;
+    }
+
+    protected function joinColumns($columns, $table)
+    {
+        if (empty($this->columns)) {
+            $this->columns[] = "`$this->table`.*";
+        }
+        if (is_string($columns) && $columns != '*') {
+            if ($columns == '*') {
+                $this->columns[] = "`$table`.*";
+            } else {
+                $this->columns[] = $this->joinColumn($columns, $table);
+            }
+        } elseif (is_array($columns)) {
+            foreach ($columns as $key => $value) {
+                if (is_int($key)) {
+                    $this->columns[] = $this->joinColumn($value);
+                } else {
+                    $name = $this->joinColumn($key);
+                    $this->columns[] = "$name AS `$value`";
+                }
+            }
+        }
+    }
+
+    protected function joinColumn($column, $table)
+    {
+        $column = self::backQuoteWord($column);
+        if (strpos($column, '.') === false) {
+            return "`$table`.$column";
+        } else {
+            return $column;
+        }
+    }
+
     public function offset()
     {
         if (!func_num_args())
