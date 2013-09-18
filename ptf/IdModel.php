@@ -26,6 +26,20 @@ class IdModel extends Model
         return static::fromArray($row);
     }
 
+    public static function fetchMany($sql, $args = array())
+    {
+        $rows = PdoWrapper::fetchAll($sql, $args);
+        if ($rows === false) {
+            return null;
+        }
+        $ret = array();
+        $pkey = static::pkey();
+        foreach ($rows as $key => $value) {
+            $ret[$value[$pkey]] = static::fromArray($value);
+        }
+        return $ret;
+    }
+
     public static function fromArray($arr)
     {
         $o = parent::fromArray($arr);

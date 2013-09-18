@@ -308,7 +308,7 @@ class Searcher
         $this->limit(1);
         list($sql, $values) = $this->buildSelectSql();
         $statement = $this->execute($sql, $values);
-        $data = $statement->fetch(PDO::FETCH_ASOCC);
+        $data = $statement->fetch(Pdo::FETCH_ASOCC);
         if ($data) {
             $class = $this->class;
             return $class::fromArray($data);
@@ -326,7 +326,7 @@ class Searcher
         $statement = $this->execute($sql, $values);
 
         $rows = array();
-        while (($row = $statement->fetch(PDO::FETCH_ASOCC)) !== false) {
+        while (($row = $statement->fetch(Pdo::FETCH_ASOCC)) !== false) {
             $class = $this->class;
             $rows[] = $class::fromArray($row);
         }
@@ -346,7 +346,7 @@ class Searcher
         $this->count = true;
         list($sql, $values) = $this->buildSelectSql();
         $statement = $this->execute($sql, $values);
-        $data = $statement->fetch(PDO::FETCH_NUM);
+        $data = $statement->fetch(Pdo::FETCH_NUM);
         if ($data) {
             return $data[0];
         }

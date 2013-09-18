@@ -116,21 +116,13 @@ class PdoWrapper
     public function fetchRow($sql, $args = array(), $fetchType = Pdo::FETCH_ASSOC)
     {
         $statement = self::execute($sql, $args);
-        $row = $statement->fetch($fetchType);
-        if ($row === false) {
-            return null;
-        }
-        return $row;
+        return $statement->fetch($fetchType);
     }
 
     public function fetchAll($sql, $args = array(), $fetchType = Pdo::FETCH_ASSOC)
     {
         $statement = self::execute($sql, $args);
-        $rows = $statement->fetchAll($fetchType);
-        if ($rows === false) {
-            return null;
-        }
-        return $rows;
+        return $statement->fetchAll($fetchType);
     }
 
     /**

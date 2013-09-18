@@ -43,6 +43,34 @@ class Model
             return camel2under($self); // camal to underscore
     }
 
+    public static function fetchOne($sql, $args = array())
+    {
+        $row = PdoWrapper::fetchRow($sql, $args);
+        if ($row === false) {
+            return null;
+        } else {
+            return static::fromArray($row);
+        }
+    }
+
+    public static function fetchMany($sql, $args = array())
+    {
+        $rows = PdoWrapper::fetchAll($sql, $args);
+        if ($rows === false) {
+            return null;
+        }
+        $ret = array();
+        foreach ($rows as $key => $value) {
+            $ret[$key] = static::fromArray($value);
+        }
+        return $ret;
+    }
+
+    public static function execute($sql, $args = array())
+    {
+        return PdoWrapper::execute($sql, $args);
+    }
+
     public function __get($name) 
     {
         return $this->get($name);

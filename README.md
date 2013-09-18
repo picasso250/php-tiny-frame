@@ -361,14 +361,48 @@ Having
 $people = ORM::for_table('person')->group_by('name')->having_not_like('name', '%bob%')->find_many();
 
 DISTINCT
-To add a DISTINCT keyword before the list of result columns in your query, add a call to distinct() to your query chain.
 
-<?php
 $distinct_names = ORM::for_table('person')->distinct()->select('name')->find_many();
-This will result in the query:
+
+生成的sql语句如下：
+
+SELECT DISTINCT `name` FROM `person`;
+
+连接
+
+ptf有一族连接函数：
+join, leftJoin, rightJoin, fullJoin.
+
+每个方法都有相同的入参。
+
+前两个参数是必须的。第一个参数是要连接的表名，第二个参数是连接条件。推荐使用三元数组指定连接条件：字段名、操作符、字段名。表名和字段名会被自动括起来。
+
+$results = ORM::for_table('person')->join('person_profile', array('person.id', '=', 'person_profile.person_id'))->find_many();
+
+用字符串作为链接条件也是可以的。
 
 <?php
-SELECT DISTINCT `name` FROM `person`;
+// Not recommended because the join condition will not be escaped.
+$results = ORM::for_table('person')->join('person_profile', 'person.id = person_profile.person_id')->find_many();
+
+如果想为被连接的表指定别名，在表名处传入一个长度为1的数组，键为原表名，值为别名。这在连接自身的时候会非常有用。
+
+连接方法还有第三个可选参数，可以是数组或者字符串，指定要选择的列。和columns方法参数一致。
+
+$results = ORM::for_table('person')
+    ->table_alias('p1')
+    ->select('p1.*')
+    ->select('p2.name', 'parent_name')
+    ->join(array('person' => 'p2'), array('p1.parent', '=', 'p2.id'))
+    ->find_many();
+
+原生查询
+
+如果你想完成更复杂的查询，你可以指定整个sql表达式。excute方法需要一个字符串和（可选的）一个参数数组。字符串可以要送问号占位符，也可以用名称占位。如果你想要获取数据，那么使用fetchMany和fetchOne方法。
+
+$people = Model::fetchMany('SELECT p.* FROM person p JOIN role r ON p.role_id = r.id WHERE r.name = :role', array('role' => 'janitor'));
+
+返回的依然是包含这个类的实例的数组。
 
 常用函数
 --------
