@@ -31,7 +31,16 @@ class Model
 
     public function toArray()
     {
-        return $this->row;
+        $num_args = func_num_args();
+        if ($num_args == 0) {
+            return $this->row;
+        }
+        
+        $names = func_get_args();
+        foreach ($names as $name) {
+            $ret[$name] = $this->row[$name];
+        }
+        return $ret;
     }
 
     public static function table()
