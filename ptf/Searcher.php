@@ -146,9 +146,141 @@ class Searcher
         return $this;
     }
 
+    /**
+     * 对应 SQL 中的 HAVING
+     * 
+     * @example
+     *     where('username', 'Jack') // WHERE `username` = 'Jack'
+     *     where(array('id' => 3)) // WHERE `id` = '3'
+     *     where(array('id' => array(3, 7, 11))) // WHERE `id` in ('3', '7', '11')
+     *     where('id', 'not in', array(3, 7, 11)) // WHERE `id` not in ('3', '7', '11')
+     *     where(array('(id=3 or id=4)', 'status' => 1)) // WHERE (id=3 or id=4) and `status` = '1'
+     */
+    public function having()
+    {
+        $arg_num = func_num_args();
+
+        if ($arg_num == 1) { // where(array(key=>value,...))
+            $a = func_get_arg(0);
+
+            // expression
+            if (is_string($a)) {
+                $this->havings[] = array($a, array());
+                return $this;
+            }
+
+            // 解析where数组
+            foreach ($a as $key => $value) {
+                if (is_int($key)) {
+                    // 支持直接使用sql表达式，以及带参数的sql表达式
+                    if (is_string($value)) {
+                        $this->havingExpr($value);
+                    } elseif (is_array($value)) {
+                        $this->havingExpr($value[0], $value[1]);
+                    }
+                } else {
+                    // 支持=和in操作符
+                    if (is_array($value)) {
+                        $this->havingIn($key, $value);
+                    } else {
+                        $this->havingEqual($key, $value);
+                    }
+                }
+            }
+        } elseif ($arg_num == 2) {
+            $key = (func_get_arg(0));
+            $value = func_get_arg(1);
+            // 支持=和in操作符
+            if (is_array($value)) {
+                $this->havingIn($key, $value);
+            } else {
+                $this->havingEqual($key, $value);
+            }
+        } elseif ($arg_num == 3) {
+            $key = self::backQuote(func_get_arg(0));
+            $operator = func_get_arg(1);
+            $value = func_get_arg(2);
+            if (is_array($value)) {
+                $placeholder = array_map(function ($e) {return '?';}, $value);
+                $placeholder = '(' . implode(', ', $placeholder) . ')';
+            }
+            if (!is_array($value)) {
+                $value = array($value);
+            }
+            $this->havings[] = array("$key $operator $placeholder", $value);
+        }
+        return $this;
+    }
+
+    /**
+     * 对应 sql 中的 having sql表达式
+     * 
+     * @example
+     *     where('id=? or id=?', array('3', '4')) // WHERE WHERE (id=3 or id=4)
+     */
+    public function havingExpr($expr, $values = array()) 
+    {
+        $this->havings[] = array("($expr)", $values);
+        return $this;
+    }
+
+    // where id=3
+    public function havingEqual($key, $value)
+    {
+        $key = self::backQuote($key);
+        if (is_object($value)) {
+            $value = $value->{$value::pkey()};
+        }
+        $this->havings[] = array("$key = ?", array($value));
+    }
+
+    // having id in (3, 4, 5)
+    public function havingIn($key, $value)
+    {
+        return $this->havingOpArray($key, 'IN', $value);
+    }
+
+    // having id not in (3, 4, 5)
+    public function havingNotIn($key, $value)
+    {
+        return $this->havingOpArray($key, 'NOT IN', $value);
+    }
+
+    protected function havingOpArray($key, $op, $arr)
+    {
+        $key = self::backQuote($key);
+        if (is_array($value)) {
+            $placeholder = array_map(function ($e) {return '?';}, $value);
+            $placeholder = implode(', ', $placeholder);
+        }
+
+        if (!is_array($value)) {
+            $value = array($value);
+        }
+
+        $this->havings[] = array("$key $op ($placeholder)", $value);
+        return $this;
+    }
+
     public function orderBy($exp)
     {
-        $this->orders[] = "$this->table.$exp";
+        $arg_num = func_num_args();
+        if ($arg_num == 1) {
+            $a = func_get_arg(0);
+            if (is_array($a)) {
+                foreach ($a as $key => $value) {
+                    $key = self::backQuote($key);
+                    $this->orderbys[] = "$key $value";
+                }
+            } elseif (is_string($a)) {
+                $this->orderbys[] = $a;
+            }
+        } elseif ($arg_num == 2) {
+            $field = self::backQuote(func_get_arg(0));
+            $sort = strtoupper(func_get_arg(1));
+            $this->orderbys[] = "$field $sort";
+        }
+        return $this;
     }
 
     public function limit()
@@ -219,6 +351,29 @@ class Searcher
             return $data[0];
         }
         return null;
+    }
+
+    public function groupBy()
+    {
+        $arg_num = func_num_args();
+        if ($arg_num == 1) {
+            $args = func_get_arg(0);
+            if (is_array($args)) {
+                foreach ($a as $key => $value) {
+                    $this->groupbys[] = self::backQuote($value);
+                }
+            }
+        } elseif ($arg_num > 1) {
+            $args = func_get_args();
+            foreach ($a as $key => $value) {
+                if (preg_match('/^\w+$/', $value)) {
+                    $this->groupbys[] = self::backQuote($value);
+                } else {
+                    $this->groupbys[] = $value;
+                }
+            }
+        }
+        return $this;
     }
 
     private function buildTable() {

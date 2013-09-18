@@ -286,6 +286,9 @@ $females = Model::search()->where('gender', '女')->findMany();
 默认返回的是一个Model对象，如果想要返回关联数组，则
 $females = Model::search()->where('gender', '女')->findArray();
 
+如果想要其他的比较符号，可以使用三个参数的where方法：
+$females = Model::search()->where('age', '!=', 23)->findMany();
+
 度量
 
 要想知道记录的数量，可以使用count方法
@@ -321,6 +324,51 @@ SELECT * FROM `person` WHERE `name` = "Fred" AND (`age` = 20 OR `age` = 25) ORDE
 
 如果你需要更大的灵活性，可以使用excute方法指定整个查询。
 
+数量和偏移
+
+注意此方法不过滤字符，所以不要直接使用用户输入入参。
+
+$people = ORM::for_table('person')->where('gender', 'female')->limit(5)->offset(10)->find_many();
+
+排序
+
+注意此方法不过滤字符，所以不要直接使用用户输入入参。
+
+orderBy()方法接受两个参数，字段名和排序方式。字段名将被括起来。
+
+$people = ORM::for_table('person')->orderBy('gender', 'asc')->orderBy('name', 'DESC')->findMany();
+
+如果需要更复杂的排序方式，也可以直接传一个表达式到这个方法里。
+
+$people = ORM::for_table('person')->orderBy('SOUNDEX(`name`)')->find_many();
+
+分组
+
+注意此方法不过滤字符，所以不要直接使用用户输入入参。
+
+添加 GROUP BY 字句，使用groubBy方法，传入字段名。此方法可以被多次调用，以便多列分组。
+
+$people = ORM::for_table('person')->where('gender', 'female')->group_by('name')->find_many();
+
+使用表达式来分组也是可以的。
+
+$people = ORM::for_table('person')->where('gender', 'female')->groupBy("FROM_UNIXTIME(`time`, '%Y-%m')")->find_many();
+
+Having
+
+当和 GROUP BY 结合查询一些需经过计算的条件时，你可以使用 HAVING 字句。只需要把where替换成having就行。
+
+$people = ORM::for_table('person')->group_by('name')->having_not_like('name', '%bob%')->find_many();
+
+DISTINCT
+To add a DISTINCT keyword before the list of result columns in your query, add a call to distinct() to your query chain.
+
+<?php
+$distinct_names = ORM::for_table('person')->distinct()->select('name')->find_many();
+This will result in the query:
+
+<?php
+SELECT DISTINCT `name` FROM `person`;
 
 常用函数
 --------
