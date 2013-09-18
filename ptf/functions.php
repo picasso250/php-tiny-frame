@@ -5,23 +5,6 @@
 
 namespace ptf;
 
-/* $_GET, $_POST, $_REQUEST helpers or shortens */
-
-function _req($name, $default = null) 
-{
-    return isset($_REQUEST[$name]) ? ($_REQUEST[$name]) : $default;
-}
-
-function _post($name, $default = null)
-{
-    return isset($_POST[$name]) ? ($_GET[$name]) : null;
-}
-
-function _get($name, $default = null)
-{
-    return isset($_GET[$name]) ? ($_GET[$name]) : null;
-}
-
 function g($a)
 {
     // get
