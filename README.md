@@ -26,7 +26,7 @@ Very small framework for website write in PHP.
 这个框架有如下特征：
 
 1. MVC 结构
-2. ORM
+2. 自带简单的 ORM
 1. 使用 PHP 做 router
 
 **这个框架还是极端的不成熟，不推荐日常使用。**
@@ -35,10 +35,6 @@ Very small framework for website write in PHP.
 ---------------
 
 默认的根目录下的文件夹有如下：
-
-* ptf
-
- 框架的源文件。
 
 * controller
 
@@ -53,7 +49,6 @@ Very small framework for website write in PHP.
  视图。模版都在里面。
 
 所有的 Model 都需要继承 Model 类，里面有一些基本的增删改查的函数，可以更方便的和数据库交互。
-
 
 简明教程
 --------------
@@ -583,10 +578,6 @@ $person = Person::search()
 -----
 
 都在文件夹 `/app_core/class` 下。
-
-- **Pdb**
-
- 数据库类
 
 - **Paginate**
 
