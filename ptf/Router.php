@@ -3,20 +3,16 @@
 /**
  * 路由类
  * 
- * 根据返回值自动渲染相应的模版文件
- * 模版文件位置：/view/template/controller/action.phtml
  * 可以指定路由规则
  * 
  * @author xiaochi
  */
 class Router {
 
-    private $url;
     private $rules = array();
 
-    public function __construct($url)
+    public function __construct()
     {
-        $this->url = $url;
     }
 
     /**
@@ -24,14 +20,14 @@ class Router {
      * 调用此函数时执行 action 方法
      * default indexController::indexAction()
      */
-    public function dispath()
+    public function dispath($url)
     {
         $param = array();
         if ($this->rules) {
             // 解析规则（阻断性）
             foreach ($this->rules as $rule) {
                 $method_match = $rule['method'] === null || in_array($_SERVER['REQUEST_METHOD'], $rule['method']);
-                if ($method_match && preg_match($rule['regex'], $this->url, $matches)) {
+                if ($method_match && preg_match($rule['regex'], $url, $matches)) {
                     
                     // 提取参量
                     foreach ($matches as $key => $value) {
@@ -41,11 +37,11 @@ class Router {
                         }
                     }
 
-                    $contr = $rule['contr'];
-                    $act = $rule['act'];
+                    $controller = $rule['controller'];
+                    $action = $rule['action'];
                     foreach ($rule['names'] as $name) {
-                        $contr = preg_replace('/\{\$'.$name.'\}/', $param[$name], $contr);
-                        $act = preg_replace('/\{\$'.$name.'\}/', $param[$name], $act);
+                        $controller = preg_replace('/\{\$'.$name.'\}/', $param[$name], $controller);
+                        $action = preg_replace('/\{\$'.$name.'\}/', $param[$name], $action);
                     }
 
                     break;
@@ -54,12 +50,12 @@ class Router {
         } else {
             // 默认的路由规则 /controller/action
             // 默认 404 page404Controller::indexAction()
-            $arr = explode('/', $this->url);
+            $arr = explode('/', $url);
             unset($arr[0]);
-            $contr = isset($arr[1]) && $arr[1] ? $arr[1] : 'index';
-            $act = isset($arr[2]) && $arr[2] ? $arr[2] : 'index';
+            $controller = isset($arr[1]) && $arr[1] ? $arr[1] : 'index';
+            $action = isset($arr[2]) && $arr[2] ? $arr[2] : 'index';
         }
-        $result = array($contr, $act, $param);
+        $result = array(array($controller, $action), $param);
         return $result;
     }
 
@@ -98,8 +94,8 @@ class Router {
             'method' => is_string($method) ? array($method) : $method,
             'regex' => '/^'.str_replace('/', '\/', $regex).'$/',
             'names' => $matches[1],
-            'contr' => $ca[0],
-            'act' => $ca[1],
+            'controller' => $ca[0],
+            'action' => $ca[1],
         );
     }
 }

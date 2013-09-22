@@ -2,28 +2,35 @@
 
 namespace ptf;
 
+use ptf\Router;
+
 /**
  * 这个文件定义了一系列全局函数，用来操作APP
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
 class PtfApp
 {
+    public $app_root;
+
     function init()
     {
         ob_start();
         session_start();
         date_default_timezone_set('PRC');
 
-        // auto require when using class (model or lib)
-        spl_autoload_register(function ($classname) {
+        if ($app_root === null) {
+            $app_root = dirname(__DIR__);
+        }
+
+        // auto require when using class (model)
+        spl_autoload_register(function ($classname) use ($this) {
             $filename = str_replace('\\', '/', $classname) . '.php';
-            $model_file = APP_ROOT . 'model' . '/' . $filename;
-            $lib_file = CORE_ROOT . 'lib' . '/' . $filename;
+            $model_file = $this->app_root . 'model' . '/' . $filename;
             if (file_exists($model_file)) 
                 require_once $model_file;
-            elseif (file_exists($lib_file))
-                require_once $lib_file;
         });
+
+        $this->router = new Router();
     }
 
     public function run()
