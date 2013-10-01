@@ -429,6 +429,7 @@ class Searcher
      * 拉取多行数据
      * 
      * 对应 select * from t
+     * @return 如无数据，返回空
      */
     public function findMany() {
         $rows = array();
