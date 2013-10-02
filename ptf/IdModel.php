@@ -21,6 +21,10 @@ class IdModel extends Model
 
     public function findOne($id)
     {
+        if ($id === null) {
+            return null;
+        }
+        
         $table = static::table();
         $pkey = static::pkey();
         $sql = "select from `$table` where `$pkey`=?";

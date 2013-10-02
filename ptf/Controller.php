@@ -38,6 +38,17 @@ class Controller
 
     protected function params()
     {
+        if (func_num_args() == 1) {
+            $args = func_get_arg(0);
+            if (is_array($args)) {
+                $ret = array();
+                foreach ($args as $name) {
+                    $ret[$name] = isset($_REQUEST[$name]) ? $_REQUEST[$name] : null;
+                }
+                return $ret;
+            }
+        }
+        
         $args = func_get_args();
         if ($args) {
             $ret = array();
