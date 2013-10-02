@@ -412,6 +412,7 @@ class Searcher
      * 拉取一行数据
      * 
      * 对应select * from t limit 1
+     * @return 找到返回对象，找不到返回null
      */
     public function findOne() {
         $this->limit(1);
@@ -429,7 +430,7 @@ class Searcher
      * 拉取多行数据
      * 
      * 对应 select * from t
-     * @return 如无数据，返回空
+     * @return 找到返回数组，包含目标对象，如无数据，返回空
      */
     public function findMany() {
         $rows = array();
