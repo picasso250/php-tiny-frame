@@ -9,7 +9,8 @@ namespace ptf;
  */
 class Controller
 {
-    public $viewRoot;
+    public $view_root;
+    public $config;
 
     private $vars = array();
     private $lazies = array('names' => array(), 'values' => array());
@@ -36,31 +37,37 @@ class Controller
         }
     }
 
-    protected function params()
+    protected function param()
     {
-        if (func_num_args() == 1) {
+        $num_args = func_num_args();
+        if ($num_args == 1) {
             $args = func_get_arg(0);
             if (is_array($args)) {
                 $ret = array();
-                foreach ($args as $name) {
-                    $ret[$name] = isset($_REQUEST[$name]) ? $_REQUEST[$name] : null;
+                foreach ($args as $a => $b) {
+                    if (is_int($a)) {
+                        $name = $b;
+                        $default = null;
+                    } else {
+                        $name = $a;
+                        $default = $b;
+                    }
+                    $ret[$name] = $this->_param($name, $default);
                 }
                 return $ret;
             }
+        } elseif ($num_args == 2) {
+            $name = func_get_arg(0);
+            $default = func_get_arg(1);
+            $this->_param($name, $default);
+        } else {
+            return $_REQUEST;
         }
-        
-        $args = func_get_args();
-        if ($args) {
-            $ret = array();
-            foreach ($args as $name) {
-                $ret[] = isset($_REQUEST[$name]) ? $_REQUEST[$name] : null;
-            }
-            if (func_num_args() == 1) {
-                return reset($ret);
-            }
-            return $ret;
-        }
-        return $_REQUEST;
+    }
+
+    private function _param($key, $default = null)
+    {
+        return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
     }
     
     public function renderView($tpl)

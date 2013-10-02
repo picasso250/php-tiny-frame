@@ -59,7 +59,7 @@ class Application
             $class = $call[0].'Controller';
             $func = $call[1].'Action';
             $c = new $class;
-            $c->viewRoot = dirname(__DIR__).'/view';
+            $c->view_root = dirname(__DIR__).'/view';
             $c->config = $this->config;
             if (method_exists($c, 'init')) {
                 $c->init();
@@ -67,7 +67,7 @@ class Application
             foreach ($param as $key => $value) {
                 $c->$key = $value;
             }
-            return $c->$func();
+            return $c->{$func}();
         } else {
             return $call($param);
         }
