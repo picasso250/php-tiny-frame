@@ -59,7 +59,7 @@ class Application
             $class = $call[0].'Controller';
             $func = $call[1].'Action';
             $c = new $class;
-            $c->view_root = dirname(__DIR__).'/view';
+            $c->view_root = "$this->root/view";
             $c->config = $this->config;
             if (method_exists($c, 'init')) {
                 $c->init();

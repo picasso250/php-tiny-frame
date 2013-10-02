@@ -72,6 +72,6 @@ class Controller
     
     public function renderView($tpl)
     {
-        include $tpl;
+        include "$this->view_root/$tpl.phtml";
     }
 }
