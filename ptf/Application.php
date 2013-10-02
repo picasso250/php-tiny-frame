@@ -12,7 +12,14 @@ class Application
 {
     public $root;
 
-    function init()
+    private $config = array();
+
+    public function config($config)
+    {
+        $this->config = $config;
+    }
+
+    public function init()
     {
         ob_start();
         session_start();
@@ -33,10 +40,10 @@ class Application
             if (file_exists($controller_file)) {
                 require_once $controller_file;
             }
-
         });
 
         $this->router = new Router();
+        $this->router->rules($this->config['routers']);
     }
 
     public function run()
@@ -49,6 +56,7 @@ class Application
             $func = $call[1].'Action';
             $c = new $class;
             $c->viewRoot = dirname(__DIR__).'/view';
+            $c->config = $this->config;
             foreach ($param as $key => $value) {
                 $c->$key = $value;
             }
