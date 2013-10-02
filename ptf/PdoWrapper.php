@@ -12,8 +12,9 @@ class PdoWrapper
 {
     protected static $instance;
     protected static $config = array(
-        'debug' => false,
-        'logging' => false,
+            'driver_options' => array(),
+            'debug' => false,
+            'logging' => false,
     );
     protected static $sqls = array();
 
@@ -43,6 +44,9 @@ class PdoWrapper
 
     public static function getDb()
     {
+        if (!self::$instance) {
+            self::$instance = new Pdo(self::$config['dsn'], self::$config['username'], self::$config['password'], self::$config['driver_options']);
+        }
         return self::$instance;
     }
 
@@ -133,7 +137,7 @@ class PdoWrapper
             self::logSql($sql, $args);
         }
 
-        $db = static::db();
+        $db = self::getDb();
         $statement = $db->prepare($sql);
         static::bindValues($statement, $args);
         $rs = $statement->execute();

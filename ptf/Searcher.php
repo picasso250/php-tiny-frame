@@ -9,7 +9,7 @@ use \Pdo;
  */
 class Searcher
 {
-    private $class = null;
+    private $class;
 
     protected $count;
     protected $columns;
@@ -545,11 +545,7 @@ class Searcher
     }
 
     private function buildTable() {
-        if ($this->table) {
-            $t = self::backQuoteWord($this->table);
-        } else {
-            $t = self::backQuoteWord(static::table());
-        }
+        $t = self::backQuoteWord($this->table);
         if ($this->as) {
             $t .= ' AS ' . self::backQuoteWord($this->as);
         }
