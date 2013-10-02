@@ -11,7 +11,7 @@ class Controller
 {
     public $viewRoot;
 
-    private $vars;
+    private $vars = array();
     private $lazies = array('names' => array(), 'values' => array());
 
     public function __get($key)
@@ -30,9 +30,9 @@ class Controller
     public function __set($key, $value)
     {
         if (is_callable($value)) {
-            $this->$lazies['names'][$key] = $value;
+            $this->lazies['names'][$key] = $value;
         } else {
-            $this->$vars[$key] = $value;
+            $this->vars[$key] = $value;
         }
     }
 

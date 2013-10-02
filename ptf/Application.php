@@ -34,8 +34,10 @@ class Application
         spl_autoload_register(function ($classname) use ($root) {
             $filename = str_replace('\\', '/', $classname) . '.php';
             $model_file = "$root/model/$filename";
-            if (file_exists($model_file)) 
+            if (file_exists($model_file)) {
                 require_once $model_file;
+                return;
+            }
             $controller_file = "$root/controller/$filename";
             if (file_exists($controller_file)) {
                 require_once $controller_file;
@@ -48,6 +50,8 @@ class Application
 
     public function run()
     {
+        $this->init();
+
         $req_uri = reset(explode('?', $_SERVER['REQUEST_URI']));
 
         list($call, $param) = $this->router->dispatch($req_uri);
@@ -57,6 +61,9 @@ class Application
             $c = new $class;
             $c->viewRoot = dirname(__DIR__).'/view';
             $c->config = $this->config;
+            if (method_exists($c, 'init')) {
+                $c->init();
+            }
             foreach ($param as $key => $value) {
                 $c->$key = $value;
             }
