@@ -26,7 +26,6 @@ class Searcher
     public function __construct($class)
     {
         $this->class = $class;
-        $this->table = $class::table();
         $this->initBuilds();
     }
 
@@ -340,29 +339,31 @@ class Searcher
     private function _join($method, $table, $on, $columns = null)
     {
         if (is_string($table)) {
-            $join = "`$table`";
             $ti = $table;
+            $table = "`$table`";
         } elseif (is_array($table)) {
             $a = reset($table);
             $ti = key($table);
-            $join = "`$ti` AS `$a`";
+            $table = "`$ti` AS `$a`";
         }
 
         if (is_array($on)) {
             $n = count($on);
             if ($n == 2) {
-                $c1 = $on[0];
-                $c2 = $on[1];
-                $on = "`$c1` = `$c2`";
+                $c1 = self::backQuote($on[0]);
+                $c2 = self::backQuote($on[1]);
+                $on = "$c1 = $c2";
             } elseif ($n == 3) {
-                $on = "`$on[0]` $on[1] `$on[2]`";
+                $c1 = self::backQuote($on[0]);
+                $c2 = self::backQuote($on[2]);
+                $on = "$c1 $on[1] $c2";
             }
         }
 
         if ($columns) {
             $this->joinColumns($columns, $ti);
         }
-        $join .= "$method $table ON $on";
+        $join = "$method $table ON $on";
         $this->joins[] = $join;
         return $this;
     }
@@ -518,7 +519,7 @@ class Searcher
         $groupBy = implode(', ', $this->groupbys);
         $orderBy = implode(', ', $this->orderbys);
         $limit = $this->limit === null ? '' : " LIMIT $this->limit";
-        $offset = $this->offset === null ? '' : " OFFSET $this->offset";
+        $offset = $this->offset ? " OFFSET $this->offset" : '';
         $sql = "SELECT"
                 . ($this->distinct ? ' DISTINCT' : '')
                 . " $field FROM $table"
@@ -611,6 +612,8 @@ class Searcher
         $this->count = false;
         $this->columns = array();
         $this->table = null;
+        $class = $this->class;
+        $this->table = $class::table();
         $this->as = null;
         $this->wheres = array();
         $this->havings = array();

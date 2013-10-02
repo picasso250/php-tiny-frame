@@ -139,10 +139,10 @@ class PdoWrapper
 
         $db = self::getDb();
         $statement = $db->prepare($sql);
-        static::bindValues($statement, $args);
+        self::bindValues($statement, $args);
         $rs = $statement->execute();
         if (!$rs) {
-            if (static::$config['debug']) {
+            if (self::$config['debug']) {
                 var_dump($statement);
                 var_dump($statement->errorInfo());
             }
