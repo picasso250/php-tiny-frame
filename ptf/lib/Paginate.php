@@ -1,5 +1,7 @@
 <?php
 
+namespace ptf\lib;
+
 /**
  * Description of Paginate
  * 翻页
