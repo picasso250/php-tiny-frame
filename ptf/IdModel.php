@@ -47,7 +47,7 @@ class IdModel extends Model
     public static function fromArray($arr)
     {
         $o = parent::fromArray($arr);
-        $o->row = $arr[static::pkey()];
+        $o->id = $arr[static::pkey()];
         return $o;
     }
 
