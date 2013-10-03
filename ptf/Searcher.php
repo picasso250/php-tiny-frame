@@ -15,6 +15,7 @@ class Searcher
     protected $columns;
     protected $table;
     protected $alias;
+    protected $joins;
     protected $wheres;
     protected $havings;
     protected $groupbys;
@@ -53,6 +54,22 @@ class Searcher
             $alias = self::backQuoteWord(func_get_arg(1));
             $this->columns[] = "$column AS $alias";
         }
+    }
+
+    public function from($table)
+    {
+        if (is_string($table)) {
+            $this->table = $table;
+        } elseif (is_array($table)) {
+            $this->table = key($table);
+            $this->alias = reset($table);
+        }
+        return $this;
+    }
+
+    public function alias($alias)
+    {
+        $this->alias = "`$alias`";
     }
 
     /**
@@ -467,7 +484,7 @@ class Searcher
         $statement = $this->execute($sql, $values);
         $data = $statement->fetch(Pdo::FETCH_NUM);
         if ($data) {
-            return $data[0];
+            return (int) ($data[0]);
         }
         return null;
     }
@@ -547,8 +564,8 @@ class Searcher
 
     private function buildTable() {
         $t = self::backQuoteWord($this->table);
-        if ($this->as) {
-            $t .= ' AS ' . self::backQuoteWord($this->as);
+        if ($this->alias) {
+            $t .= " AS `$this->alias`";
         }
         return $t;
     }
@@ -611,10 +628,10 @@ class Searcher
     {
         $this->count = false;
         $this->columns = array();
-        $this->table = null;
         $class = $this->class;
         $this->table = $class::table();
-        $this->as = null;
+        $this->alias = null;
+        $this->joins = array();
         $this->wheres = array();
         $this->havings = array();
         $this->groupbys = array();
