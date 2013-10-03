@@ -47,7 +47,7 @@ class IdModel extends Model
     public static function fromArray($arr)
     {
         $o = parent::fromArray($arr);
-        $o->row = $row[static::pkey()];
+        $o->row = $arr[static::pkey()];
         return $o;
     }
 
@@ -79,7 +79,7 @@ class IdModel extends Model
     public function insert()
     {
         PdoWrapper::insert(static::table(), $this->row);
-        return PdoWrapper::lastInsert();
+        return PdoWrapper::lastInsertId();
     }
 
     public function update()

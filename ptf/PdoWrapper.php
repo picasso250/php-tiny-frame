@@ -64,7 +64,7 @@ class PdoWrapper
     {
         $keys = array_keys($data);
         $keystr = implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
-        $values .= implode(', ', array_map(function ($k) {return ":$k";}, $keys));
+        $values = implode(', ', array_map(function ($k) {return ":$k";}, $keys));
         $sql = "INSERT INTO `$table` ($keystr) VALUES ($values)";
         $statement = self::execute($sql, $data);
         return $statement->rowCount();
@@ -127,6 +127,11 @@ class PdoWrapper
     {
         $statement = self::execute($sql, $args);
         return $statement->fetchAll($fetchType);
+    }
+
+    public function lastInsertId()
+    {
+        return self::getDb()->lastInsertId();
     }
 
     /**

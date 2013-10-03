@@ -26,7 +26,7 @@ class Model
     {
         $self = get_called_class();
         $o = new $self();
-        $o->$row = $row;
+        $o->row = $arr;
         return $o;
     }
 
