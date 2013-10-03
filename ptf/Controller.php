@@ -55,6 +55,9 @@ class Controller
                     $ret[$name] = $this->_param($name, $default);
                 }
                 return $ret;
+            } elseif (is_string($args)) {
+                $name = $args;
+                return $this->_param($name, null);
             }
         } elseif ($num_args == 2) {
             $name = func_get_arg(0);
@@ -94,5 +97,11 @@ class Controller
     public function renderBlock($tpl)
     {
         include "$this->view_root/$tpl.phtml";
+    }
+
+    public function redirect($url)
+    {
+        header('Location: '.$url);
+        exit;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace ptf;
 
-use \Pdo;
+use \PDO;
 
 /**
  * @author ryan
@@ -436,7 +436,7 @@ class Searcher
         $this->limit(1);
         list($sql, $values) = $this->buildSelectSql();
         $statement = $this->execute($sql, $values);
-        $data = $statement->fetch(Pdo::FETCH_ASOCC);
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
             $class = $this->class;
             return $class::fromArray($data);
@@ -482,7 +482,7 @@ class Searcher
         $this->count = true;
         list($sql, $values) = $this->buildSelectSql();
         $statement = $this->execute($sql, $values);
-        $data = $statement->fetch(Pdo::FETCH_NUM);
+        $data = $statement->fetch(PDO::FETCH_NUM);
         if ($data) {
             return (int) ($data[0]);
         }
