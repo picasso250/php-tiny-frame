@@ -63,9 +63,9 @@ class PdoWrapper
     public function insert($table, $data) 
     {
         $keys = array_keys($data);
-        $keys .= implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
+        $keystr = implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
         $values .= implode(', ', array_map(function ($k) {return ":$k";}, $keys));
-        $sql = "INSERT INTO `$table` ($keys) VALUES ($values)";
+        $sql = "INSERT INTO `$table` ($keystr) VALUES ($values)";
         $statement = self::execute($sql, $data);
         return $statement->rowCount();
     }
@@ -167,6 +167,7 @@ class PdoWrapper
             }
         }
         self::$sqls[] = $sql;
+        echo "$sql\n";
     }
 
     /**

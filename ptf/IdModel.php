@@ -11,8 +11,6 @@ class IdModel extends Model
 
     protected $id;
 
-    protected $dirty;
-
     public static function create()
     {
         $self = get_called_class();
@@ -67,27 +65,12 @@ class IdModel extends Model
         return $this->row[static::pkey()];
     }
 
-    public function set()
-    {
-        $num = func_num_args();
-        if ($num == 1 && $args = func_get_arg(0) && is_array($args)) {
-            foreach ($args as $key => $value) {
-                $this->row[$key] = $value;
-                $this->dirty[$key] = true;
-            }
-        } elseif ($num == 2) {
-            $key = func_get_arg(0);
-            $value = func_get_arg(1);
-            $this->row[$key] = $value;
-        }
-    }
-
     public function save()
     {
-        if (isset($this->id)) {
-            $this->insert();
-        } else {
+        if (isset($this->id) && $this->id) {
             $this->update();
+        } else {
+            $this->insert();
         }
         $thsi->dirty = array();
         return $this;
@@ -95,7 +78,7 @@ class IdModel extends Model
 
     public function insert()
     {
-        PdoWrapper::insert(static::tabel(), $this->row);
+        PdoWrapper::insert(static::table(), $this->row);
         return PdoWrapper::lastInsert();
     }
 
