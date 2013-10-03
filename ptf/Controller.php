@@ -69,8 +69,29 @@ class Controller
     {
         return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
     }
+
+    public function layout($tpl)
+    {
+        $this->layout = $tpl;
+    }
     
     public function renderView($tpl)
+    {
+        if ($this->layout) {
+            $this->view = $tpl;
+            include "$this->view_root/$this->layout.phtml";
+            $this->layout = null;
+        } else {
+            include "$this->view_root/$tpl.phtml";
+        }
+    }
+
+    public function yieldView()
+    {
+        include "$this->view_root/$this->view.phtml";
+    }
+
+    public function renderBlock($tpl)
     {
         include "$this->view_root/$tpl.phtml";
     }
