@@ -69,4 +69,9 @@ class IdDao extends Searcher
         $where = array($this->pkey(), $entity->id());
         return PdoWrapper::delete($this->table(), $where);
     }
+
+    public function now()
+    {
+        return date('Y-m-d H:i:s', time());
+    }
 }

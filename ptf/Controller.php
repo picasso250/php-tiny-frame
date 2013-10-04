@@ -104,4 +104,9 @@ class Controller
         header('Location: '.$url);
         exit;
     }
+
+    public function ip()
+    {
+        return $_SERVER['REMOTE_ADDR'];
+    }
 }

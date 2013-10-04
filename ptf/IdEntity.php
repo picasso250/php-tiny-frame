@@ -14,6 +14,8 @@ class IdEntity
     protected $row = array(); // data
     protected $id = 0;
 
+    protected $dirty = array();
+
     public static function make($model, $row)
     {
         $classname = get_called_class();
@@ -36,7 +38,11 @@ class IdEntity
 
     public function id()
     {
-        return $this->row[$this->model->pkey()];
+        $pkey = $this->model->pkey();
+        if (!isset($this->row[$pkey])) {
+            return 0;
+        }
+        return $this->row[$pkey];
     }
 
     public function save()
