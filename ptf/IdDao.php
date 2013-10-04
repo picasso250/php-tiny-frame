@@ -5,10 +5,10 @@ namespace ptf;
 /**
  * @author ryan
  */
-class IdModel extends Searcher
+class IdDao extends Searcher
 {
+    protected $table;
     protected $pkey;
-
     protected $id;
 
     public function create()
@@ -18,7 +18,9 @@ class IdModel extends Searcher
 
     protected function makeEntity($row)
     {
-        return IdEntity::make($this, $row);
+        preg_match('/^(\w+)Dao$/', get_called_class(), $matches);
+        $classname = $matches[1];
+        return $classname::make($this, $row);
     }
 
     public function table()

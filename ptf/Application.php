@@ -33,14 +33,22 @@ class Application
         // auto require when using class (model)
         spl_autoload_register(function ($classname) use ($root) {
             $filename = str_replace('\\', '/', $classname) . '.php';
-            $model_file = "$root/model/$filename";
-            if (file_exists($model_file)) {
-                require_once $model_file;
+
+            if (preg_match('/Dao$/', $classname)) {
+                $file = "$root/dao/$filename";
+                require $file;
                 return;
             }
-            $controller_file = "$root/controller/$filename";
+
+            if (preg_match('/Controller$/', $classname)) {
+                $controller_file = "$root/controller/$filename";
+                require $controller_file;
+                return;
+            }
+
+            $file = "$root/entity/$filename";
             if (file_exists($controller_file)) {
-                require_once $controller_file;
+                require $controller_file;
             }
         });
 

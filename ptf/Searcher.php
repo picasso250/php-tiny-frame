@@ -56,9 +56,9 @@ class Searcher
     public function from($table)
     {
         if (is_string($table)) {
-            $this->table = $table;
+            $this->table_ = $table;
         } elseif (is_array($table)) {
-            $this->table = key($table);
+            $this->table_ = key($table);
             $this->alias = reset($table);
         }
         return $this;
@@ -457,7 +457,6 @@ class Searcher
         $ret = array();
         if ($sql === null) {
             foreach ($this->findArray() ?: array() as $key => $value) {
-                $class = $this->class;
                 $o = $this->makeEntity($value);
                 $ret[$o->id()] = $o;
             }
@@ -568,7 +567,7 @@ class Searcher
     }
 
     private function buildTable() {
-        $t = self::backQuoteWord($this->table);
+        $t = self::backQuoteWord($this->table_);
         if ($this->alias) {
             $t .= " AS `$this->alias`";
         }
@@ -633,8 +632,7 @@ class Searcher
     {
         $this->count = false;
         $this->columns = array();
-        $class = $this->class;
-        $this->table = $class::table();
+        $this->table_ = $this->table;
         $this->alias = null;
         $this->joins = array();
         $this->wheres = array();
