@@ -10,18 +10,32 @@ use \PDO;
  */
 class IdEntity
 {
-    protected $model;
+    protected $model; // model object
+    protected $row = array(); // data
+    protected $id = 0;
+
+    public static function make($model, $row)
+    {
+        $o = new self;
+        $o->model = $model;
+        if ($row) {
+            $o->row = $row;
+            $o->id = $row[$model->pkey()];
+        }
+        return $o;
+    }
 
     public static function fromArray($arr)
     {
-        $o = parent::fromArray($arr);
-        $o->id = $arr[static::pkey()];
+        $o = new self;
+        $o->row = $row;
+        $o->id = $arr[$this->model->pkey()];
         return $o;
     }
 
     public function id()
     {
-        return $this->row[static::pkey()];
+        return $this->row[$this->model->pkey()];
     }
 
     public function save()
@@ -36,6 +50,11 @@ class IdEntity
             $set[$key] = $this->row[$key];
         }
         return $set;
+    }
+
+    public function clean()
+    {
+        $this->dirty = array();
     }
 
     public function delete()

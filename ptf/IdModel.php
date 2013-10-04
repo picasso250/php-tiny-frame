@@ -2,8 +2,6 @@
 
 namespace ptf;
 
-use \PDO;
-
 /**
  * @author ryan
  */
@@ -15,8 +13,7 @@ class IdModel extends Model
 
     public static function create()
     {
-        $self = get_called_class();
-        return new $self();
+        return IdEntity::make($this, array());
     }
 
     public function findOne($id)
@@ -25,88 +22,67 @@ class IdModel extends Model
             return null;
         }
         
-        var_dump(get_called_class());
-        $table = self::table();
-        $pkey = self::pkey();
+        $table = $this->table();
+        $pkey = $this->pkey();
         $sql = "SELECT * FROM `$table` WHERE `$pkey`=?";
-        $row = PdoWrapper::fetchRow($sql, array($id), PDO::FETCH_ASSOC);
-        return static::fromArray($row);
+        $row = PdoWrapper::fetchRow($sql, array($id));
+        return IdEntity::make($this, $row);
     }
 
     public static function fetchMany($sql, $args = array())
     {
         $rows = PdoWrapper::fetchAll($sql, $args);
         if ($rows === false) {
-            return null;
+            return array();
         }
+
         $ret = array();
-        $pkey = static::pkey();
+        $pkey = $this->pkey();
         foreach ($rows as $key => $value) {
-            $ret[$value[$pkey]] = static::fromArray($value);
+            $ret[$value[$pkey]] = IdEntity::make($this, $value);
         }
         return $ret;
     }
 
-    public static function fromArray($arr)
-    {
-        $o = parent::fromArray($arr);
-        $o->id = $arr[static::pkey()];
-        return $o;
-    }
-
-    public static function pkey()
+    public function pkey()
     {
         $defaultPrimaryKey = 'id';
-        if (isset(static::$pkey))
-            return static::$pkey;
+        if (isset($this->pkey))
+            return $this->pkey;
         else 
             return $defaultPrimaryKey;
     }
 
-    public function id()
-    {
-        return $this->row[static::pkey()];
-    }
-
-    public function save()
+    public function save(IdEntity $entity)
     {
         if (isset($this->id) && $this->id) {
-            $this->update();
+            $this->update($entity);
         } else {
-            $this->insert();
+            $this->insert($entity);
         }
-        $thsi->dirty = array();
+        $entity->clean();
         return $this;
     }
 
-    public function insert()
+    public function insert($entity)
     {
-        PdoWrapper::insert(static::table(), $this->row);
+        PdoWrapper::insert($this->table(), $entity->toArray());
         return PdoWrapper::lastInsertId();
     }
 
-    public function update()
+    public function update($entity)
     {
-        $set = $this->dirtyArray();
+        $set = $entity->dirtyArray();
         if ($set) {
-            $where = array(static::pkey(), $this->id);
-            return PdoWrapper::update(static::tabel(), $set, $where);
+            $where = array($this->pkey(), $entity->id());
+            return PdoWrapper::update($this->tabel(), $set, $where);
         }
         return 0;
     }
 
-    public function dirtyArray()
-    {
-        $set = array();
-        foreach ($this->dirty as $key => $value) {
-            $set[$key] = $this->row[$key];
-        }
-        return $set;
-    }
-
     public function delete()
     {
-        $where = array(static::pkey(), $this->id);
-        return PdoWrapper::delete(static::table(), $where);
+        $where = array($this->pkey(), $entity->id());
+        return PdoWrapper::delete($this->table(), $where);
     }
 }

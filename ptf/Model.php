@@ -30,28 +30,9 @@ class Model
         return $o;
     }
 
-    public function toArray()
+    public function table()
     {
-        $num_args = func_num_args();
-        if ($num_args == 0) {
-            return $this->row;
-        }
-        
-        $names = func_get_args();
-        foreach ($names as $name) {
-            $ret[$name] = $this->row[$name];
-        }
-        return $ret;
-    }
-
-    public static function table()
-    {
-        return static::$table;
-        $self = get_called_class();
-        if (isset($self::$table))
-            return $self::$table;
-        else
-            return self::camel2under($self); // camal to underscore
+        return $this->table;
     }
 
     public static function fetchOne($sql, $args = array())
@@ -133,8 +114,4 @@ class Model
         return $this->get($key);
     }
 
-    public function camel2under($words)
-    {
-        return strtolower(ltrim(preg_replace('/[A-Z]/', '_\\0', $words), '_'));
-    }
 }
