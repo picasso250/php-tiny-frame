@@ -204,25 +204,11 @@ function underscoreToCamelCase($value)
  
 function camelCaseToUnderscore($value) 
 {
-    return preg_replace_callback('/([A-Z])/', function($char) { return '_'.strtolower($char[1]); }, lcfirst($value));
-}
-
-
-// usage: 
-//     $url could be empty, which will go to index, 
-//     could be out link, such "http://google.com"
-//     also could be absulote path, such as "/root/login"
-//     the begining "/" could be omitted
-function redirect($url='') 
-{
-    // 1. out link ==> directly
-    // 2. inner link (without root) ==> add ROOT first
-    // 3. inner link (with root) ==> directly
-    if (strpos($url, 'http') !== 0 && strpos($url, '/') !== 0) { // inner link relatively
-        $url = ROOT . $url;
-    }
-    header('Location:'.$url);
-    exit();
+    return preg_replace_callback(
+        '/([A-Z])/', 
+        function($char) { return '_'.strtolower($char[1]); }, 
+        lcfirst($value)
+    );
 }
 
 function sae_log($msg)
