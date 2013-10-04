@@ -47,8 +47,8 @@ class Application
             }
 
             $file = "$root/entity/$filename";
-            if (file_exists($controller_file)) {
-                require $controller_file;
+            if (file_exists($file)) {
+                require $file;
             }
         });
 
