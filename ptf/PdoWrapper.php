@@ -172,7 +172,6 @@ class PdoWrapper
             }
         }
         self::$sqls[] = $sql;
-        echo "$sql\n";
     }
 
     /**

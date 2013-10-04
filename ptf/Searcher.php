@@ -322,11 +322,9 @@ class Searcher
         return $this;
     }
 
-    public function limit()
+    public function limit($limit)
     {
-        if (!func_num_args())
-            return $this->limit;
-        $this->limit = func_get_arg(0);
+        $this->limit = $limit;
         return $this;
     }
 
@@ -415,11 +413,9 @@ class Searcher
         }
     }
 
-    public function offset()
+    public function offset($offset)
     {
-        if (!func_num_args())
-            return $this->offset;
-        $this->offset = func_get_arg(0);
+        $this->offset = $offset;
         return $this;
     }
 

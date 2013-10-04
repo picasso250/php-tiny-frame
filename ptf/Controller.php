@@ -62,7 +62,7 @@ class Controller
         } elseif ($num_args == 2) {
             $name = func_get_arg(0);
             $default = func_get_arg(1);
-            $this->_param($name, $default);
+            return $this->_param($name, $default);
         } else {
             return $_REQUEST;
         }
