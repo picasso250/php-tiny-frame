@@ -16,7 +16,8 @@ class IdEntity
 
     public static function make($model, $row)
     {
-        $o = new self;
+        $classname = get_called_class();
+        $o = new $classname;
         $o->model = $model;
         if ($row) {
             $o->row = $row;
