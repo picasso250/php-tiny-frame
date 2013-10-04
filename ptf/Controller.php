@@ -94,8 +94,11 @@ class Controller
         include "$this->view_root/$this->view.phtml";
     }
 
-    public function renderBlock($tpl)
+    public function renderBlock($tpl, $data = array())
     {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
         include "$this->view_root/$tpl.phtml";
     }
 

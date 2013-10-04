@@ -47,7 +47,13 @@ class IdEntity
 
     public function save()
     {
-        return $this->model->save($this);
+        if ($this->id()) {
+            $this->model->update($this);
+        } else {
+            $this->row[$this->model->pkey()] = $this->model->insert($this);
+        }
+        $this->clean();
+        return $this;
     }
 
     public function dirtyArray()
