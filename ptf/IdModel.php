@@ -5,13 +5,13 @@ namespace ptf;
 /**
  * @author ryan
  */
-class IdModel extends Model
+class IdModel extends Searcher
 {
-    protected static $pkey;
+    protected $pkey;
 
     protected $id;
 
-    public static function create()
+    public function create()
     {
         return IdEntity::make($this, array());
     }
@@ -29,19 +29,9 @@ class IdModel extends Model
         return IdEntity::make($this, $row);
     }
 
-    public static function fetchMany($sql, $args = array())
+    public function table()
     {
-        $rows = PdoWrapper::fetchAll($sql, $args);
-        if ($rows === false) {
-            return array();
-        }
-
-        $ret = array();
-        $pkey = $this->pkey();
-        foreach ($rows as $key => $value) {
-            $ret[$value[$pkey]] = IdEntity::make($this, $value);
-        }
-        return $ret;
+        return $this->table;
     }
 
     public function pkey()
@@ -55,7 +45,7 @@ class IdModel extends Model
 
     public function save(IdEntity $entity)
     {
-        if (isset($this->id) && $this->id) {
+        if ($entity->id()) {
             $this->update($entity);
         } else {
             $this->insert($entity);

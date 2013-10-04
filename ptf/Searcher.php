@@ -9,8 +9,6 @@ use \PDO;
  */
 class Searcher
 {
-    private $class;
-
     protected $count;
     protected $columns;
     protected $table;
@@ -24,9 +22,8 @@ class Searcher
     protected $limit;
     protected $offset;
     
-    public function __construct($class)
+    public function __construct()
     {
-        $this->class = $class;
         $this->initBuilds();
     }
 
@@ -432,14 +429,20 @@ class Searcher
      * 对应select * from t limit 1
      * @return 找到返回对象，找不到返回null
      */
-    public function findOne() {
-        $this->limit(1);
-        list($sql, $values) = $this->buildSelectSql();
+    public function findOne($id = null) {
+        if ($id === null) {
+            $this->limit(1);
+            list($sql, $values) = $this->buildSelectSql();
+        } else {
+            $table = $this->table();
+            $pkey = $this->pkey();
+            $sql = "SELECT * FROM `$table` WHERE `$pkey`=?";
+            $values = array($id);
+        }
         $statement = $this->execute($sql, $values);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            $class = $this->class;
-            return $class::fromArray($data);
+            return IdEntity::make($this, $data);
         }
         return null;
     }
@@ -450,16 +453,30 @@ class Searcher
      * 对应 select * from t
      * @return 找到返回数组，包含目标对象，如无数据，返回空
      */
-    public function findMany() {
-        $rows = array();
-        foreach ($this->findArray() as $key => $value) {
-            $class = $this->class;
-            $o = $class::fromArray($value);
-            if ($o instanceof IdModel) {
-                $rows[$o->id()] = $o;
-            } else {
-                $rows[] = $o;
+    public function findMany($sql = null, $args = array()) {
+        if ($sql === null) {
+            $rows = array();
+            foreach ($this->findArray() as $key => $value) {
+                $class = $this->class;
+                $o = IdEntity::make($this->$value);
+                if ($o instanceof IdModel) {
+                    $rows[$o->id()] = $o;
+                } else {
+                    $rows[] = $o;
+                }
             }
+        } else {
+            $rows = PdoWrapper::fetchAll($sql, $args);
+            if ($rows === false) {
+                return array();
+            }
+
+            $ret = array();
+            $pkey = $this->pkey();
+            foreach ($rows as $key => $value) {
+                $ret[$value[$pkey]] = IdEntity::make($this, $value);
+            }
+            return $ret;
         }
         return $rows;
     }
