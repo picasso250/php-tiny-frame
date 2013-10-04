@@ -2,6 +2,8 @@
 
 namespace ptf;
 
+use \PDO;
+
 /**
  * @author ryan
  */
@@ -23,10 +25,11 @@ class IdModel extends Model
             return null;
         }
         
-        $table = static::table();
-        $pkey = static::pkey();
-        $sql = "select from `$table` where `$pkey`=?";
-        $row = self::fetchRow($sql, array($id), Pdo::FETCH_ASSOC);
+        var_dump(get_called_class());
+        $table = self::table();
+        $pkey = self::pkey();
+        $sql = "SELECT * FROM `$table` WHERE `$pkey`=?";
+        $row = PdoWrapper::fetchRow($sql, array($id), PDO::FETCH_ASSOC);
         return static::fromArray($row);
     }
 

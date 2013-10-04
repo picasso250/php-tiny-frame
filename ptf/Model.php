@@ -46,11 +46,12 @@ class Model
 
     public static function table()
     {
+        return static::$table;
         $self = get_called_class();
         if (isset($self::$table))
             return $self::$table;
         else
-            return camel2under($self); // camal to underscore
+            return self::camel2under($self); // camal to underscore
     }
 
     public static function fetchOne($sql, $args = array())
@@ -130,5 +131,10 @@ class Model
     public function __get($key)
     {
         return $this->get($key);
+    }
+
+    public function camel2under($words)
+    {
+        return strtolower(ltrim(preg_replace('/[A-Z]/', '_\\0', $words), '_'));
     }
 }
