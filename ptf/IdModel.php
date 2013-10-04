@@ -13,19 +13,11 @@ class IdModel extends Searcher
 
     public function create()
     {
-        return IdEntity::make($this, array());
+        return $this->makeEntity(array());
     }
 
-    public function findOne($id)
+    protected function makeEntity($row)
     {
-        if ($id === null) {
-            return null;
-        }
-        
-        $table = $this->table();
-        $pkey = $this->pkey();
-        $sql = "SELECT * FROM `$table` WHERE `$pkey`=?";
-        $row = PdoWrapper::fetchRow($sql, array($id));
         return IdEntity::make($this, $row);
     }
 

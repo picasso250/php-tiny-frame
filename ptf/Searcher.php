@@ -442,7 +442,7 @@ class Searcher
         $statement = $this->execute($sql, $values);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            return IdEntity::make($this, $data);
+            return $this->makeEntity($data);
         }
         return null;
     }
@@ -454,16 +454,12 @@ class Searcher
      * @return 找到返回数组，包含目标对象，如无数据，返回空
      */
     public function findMany($sql = null, $args = array()) {
+        $ret = array();
         if ($sql === null) {
-            $rows = array();
-            foreach ($this->findArray() as $key => $value) {
+            foreach ($this->findArray() ?: array() as $key => $value) {
                 $class = $this->class;
-                $o = IdEntity::make($this->$value);
-                if ($o instanceof IdModel) {
-                    $rows[$o->id()] = $o;
-                } else {
-                    $rows[] = $o;
-                }
+                $o = $this->makeEntity($value);
+                $ret[$o->id()] = $o;
             }
         } else {
             $rows = PdoWrapper::fetchAll($sql, $args);
@@ -474,23 +470,15 @@ class Searcher
             $ret = array();
             $pkey = $this->pkey();
             foreach ($rows as $key => $value) {
-                $ret[$value[$pkey]] = IdEntity::make($this, $value);
+                $ret[$value[$pkey]] = $this->makeEntity($value);
             }
-            return $ret;
         }
-        return $rows;
+        return $ret;
     }
 
     public function findArray() {
         list($sql, $values) = $this->buildSelectSql();
         return PdoWrapper::fetchAll($sql, $values);
-    }
-
-    public function makeEntity($row)
-    {
-        $o = new $this->class;
-        $o->fillWith($row);
-        return $o;
     }
 
     public function count() 
