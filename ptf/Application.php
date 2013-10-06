@@ -2,6 +2,7 @@
 
 namespace ptf;
 
+use \Exception;
 use ptf\Router;
 
 /**
@@ -32,21 +33,21 @@ class Application
 
         // auto require when using class (model)
         spl_autoload_register(function ($classname) use ($root) {
-            $filename = str_replace('\\', '/', $classname) . '.php';
+            $file_name = str_replace('\\', '/', $classname) . '.php';
 
             if (preg_match('/Dao$/', $classname)) {
-                $file = "$root/dao/$filename";
+                $file = "$root/dao/$file_name";
                 require $file;
                 return;
             }
 
             if (preg_match('/Controller$/', $classname)) {
-                $controller_file = "$root/controller/$filename";
+                $controller_file = "$root/controller/$file_name";
                 require $controller_file;
                 return;
             }
 
-            $file = "$root/entity/$filename";
+            $file = "$root/entity/$file_name";
             if (file_exists($file)) {
                 require $file;
             }
@@ -87,15 +88,16 @@ class Application
         if (isset($_SERVER['HTTP_APPNAME'])) {
             return saeUpload($content, $file_name);
         } else {
-            $root = "$this->root/data/upload/";
-            $date = date('Ymd');
-            $path .= $date;
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
+            $dir = "/data/upload/".date('Ymd');
+            $absolute_dir = $this->root.$dir;
+            if (!file_exists($absolute_dir)) {
+                $rs = mkdir($absolute_dir, 0777, true);
+                if (!$rs) {
+                    throw new Exception("unable to mkdir $absolute_dir", 1);
+                }
             }
-            $path .= '/'.$file_name;
-            file_put_contents($path, $content);
-            return $path;
+            file_put_contents("$absolute_dir/$file_name", $content);
+            return "$dir/$file_name";
         }
     }
 

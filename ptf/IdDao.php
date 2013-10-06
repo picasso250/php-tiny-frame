@@ -47,16 +47,14 @@ class IdDao extends Searcher
     {
         $set = $entity->dirtyArray();
         if ($set) {
-            $where = array($this->pkey(), $entity->id());
-            return PdoWrapper::update($this->tabel(), $set, $where);
+            return PdoWrapper::update($this->table(), $set, "`{$this->pkey()}`=?", array($entity->id()));
         }
         return 0;
     }
 
     public function delete()
     {
-        $where = array($this->pkey(), $entity->id());
-        return PdoWrapper::delete($this->table(), $where);
+        return PdoWrapper::delete($this->table(), "`{$this->pkey()}`=?", array($entity->id()));
     }
 
     public function now()

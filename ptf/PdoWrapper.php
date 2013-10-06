@@ -106,9 +106,9 @@ class PdoWrapper
      * 
      * @param string $id
      */
-    public function delete($whereStr = '', $whereVals = array()) {
+    public function delete($table, $whereStr = '', $whereVals = array()) {
 
-        $sql = "DELETE FROM `$table()`";
+        $sql = "DELETE FROM `$table`";
         if ($whereStr) {
             $sql .= " WHERE $whereStr";
         }

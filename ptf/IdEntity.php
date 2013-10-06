@@ -59,7 +59,7 @@ class IdEntity
     public function dirtyArray()
     {
         $set = array();
-        foreach ($this->dirty as $key => $value) {
+        foreach ($this->dirty as $key) {
             $set[$key] = $this->row[$key];
         }
         return $set;
