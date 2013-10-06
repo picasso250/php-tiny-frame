@@ -69,6 +69,7 @@ class Application
             $c = new $class;
             $c->view_root = "$this->root/view";
             $c->config = $this->config;
+            $c->app = $this;
             if (method_exists($c, 'init')) {
                 $c->init();
             }
@@ -86,28 +87,19 @@ class Application
         if (isset($_SERVER['HTTP_APPNAME'])) {
             return saeUpload($content, $file_name);
         } else {
-            $root = 'data/';
-            $dst_root = $root .'upload/';
-            if (!file_exists($dst_root)) {
-                mkdir($dst_root);
-            }
-            $year_month_folder = date('Ym');
-            $path = $year_month_folder;
-            if (!file_exists($dst_root.$path)) {
-                mkdir($dst_root.$path);
-            }
-            $date_folder = date('d');
-            $path .= '/'.$date_folder;
-            if (!file_exists($dst_root.$path)) {
-                mkdir($dst_root.$path);
+            $root = "$this->root/data/upload/";
+            $date = date('Ymd');
+            $path .= $date;
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
             }
             $path .= '/'.$file_name;
-            file_put_contents($dst_root.$path, $content);
-            return ROOT . 'data/upload/' . $path;
+            file_put_contents($path, $content);
+            return $path;
         }
     }
 
-    public function saeUpload($content, $file_name) 
+    public function saeUpload($content, $file_name)
     {
         $up_domain = UP_DOMAIN;
         $s = new SaeStorage();

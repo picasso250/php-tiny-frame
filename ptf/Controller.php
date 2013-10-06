@@ -11,6 +11,7 @@ class Controller
 {
     public $view_root;
     public $config;
+    public $app;
 
     private $vars = array();
     private $lazies = array('names' => array(), 'values' => array());
