@@ -15,6 +15,9 @@ class Controller
     private $vars = array();
     private $lazies = array('names' => array(), 'values' => array());
 
+    private $scripts = array();
+    private $styles = array();
+
     public function __get($key)
     {
         if (array_key_exists($key, $this->vars)) {
@@ -68,6 +71,14 @@ class Controller
         }
     }
 
+    public function paramFile($name)
+    {
+        if (isset($_FILES[$name])) {
+            return $_FILES[$name];
+        }
+        return null;
+    }
+
     private function _param($key, $default = null)
     {
         return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
@@ -102,6 +113,16 @@ class Controller
         include "$this->view_root/$tpl.phtml";
     }
 
+    public function addScript($js)
+    {
+        $this->scripts[] = $js;
+    }
+
+    public function addStyle($css)
+    {
+        $this->styles[] = $css;
+    }
+
     public function redirect($url)
     {
         header('Location: '.$url);
@@ -112,4 +133,6 @@ class Controller
     {
         return $_SERVER['REMOTE_ADDR'];
     }
+
+    
 }

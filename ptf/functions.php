@@ -167,7 +167,7 @@ function write_upload($content, $file_name)
     return ROOT . 'data/upload/' . $path;
 }
 
-function sae_upload$content, $file_name) 
+function sae_upload($content, $file_name) 
 {
     $up_domain = UP_DOMAIN;
     $s = new SaeStorage();
