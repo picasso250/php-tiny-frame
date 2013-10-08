@@ -94,15 +94,22 @@ class Application
         } else {
             $dir = "/data/upload/".date('Ymd');
             $absolute_dir = $this->root.$dir;
-            if (!file_exists($absolute_dir)) {
-                $rs = mkdir($absolute_dir, 0777, true);
-                if (!$rs) {
-                    throw new Exception("unable to mkdir $absolute_dir", 1);
-                }
-            }
+            $this->mkdir($absolute_dir);
             file_put_contents("$absolute_dir/$file_name", $content);
             return "$dir/$file_name";
         }
+    }
+    
+    protected function mkdir($dir)
+    {
+        if (!file_exists($dir)) {
+            $rs = mkdir($dir, 0777, true);
+            if (!$rs) {
+                throw new Exception("unable to mkdir $dir", 1);
+            }
+            return $rs;
+        }
+        return true;
     }
 
     public function saeUpload($content, $file_name)
