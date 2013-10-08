@@ -16,7 +16,7 @@ Very small framework for website write in PHP.
 
 这个框架参考了
 - **鸡爷** 的自用框架，
-- [LazyPHP3](https://github.com/easychen/LazyPHP)
+- [LazyPHP3](http://ftqq.com/open-source-projects/lazyphp/)
 - [Idiorm](http://j4mie.github.io/idiormandparis/)
 - [Klein](http://chriso.github.io/klein.php/)
 - [Zend FrameWork 2](http://framework.zend.com/)
