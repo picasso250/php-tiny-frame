@@ -172,6 +172,10 @@ function camelCaseToUnderscore($value)
     );
 }
 
+/**
+ * 貌似可以直接放在Controller中
+ * @param type $msg
+ */
 function sae_log($msg)
 {
     sae_set_display_errors(false); //关闭信息输出

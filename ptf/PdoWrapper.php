@@ -6,6 +6,7 @@ use \Pdo;
 use \Exception;
 
 /**
+ * PDO 封装
  * @author ryan
  */
 class PdoWrapper

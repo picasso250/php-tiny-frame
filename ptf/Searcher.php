@@ -5,6 +5,7 @@ namespace ptf;
 use \PDO;
 
 /**
+ * SQL 拼装
  * @author ryan
  */
 class Searcher

@@ -3,7 +3,7 @@
 namespace ptf;
 
 /**
- * 
+ * 控制器基类
  * get set 可以设置懒加载的服务
  * @author ryan
  */

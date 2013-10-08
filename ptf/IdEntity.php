@@ -2,9 +2,9 @@
 
 namespace ptf;
 
-use \PDO;
-
 /**
+ * 实体基类
+ * 
  * represents a row in a tabel
  * @author ryan
  */
@@ -31,7 +31,7 @@ class IdEntity
     public static function fromArray($arr)
     {
         $o = new self;
-        $o->row = $row;
+        $o->row = $arr;
         $o->id = $arr[$this->model->pkey()];
         return $o;
     }

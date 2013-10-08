@@ -6,7 +6,7 @@ use \Exception;
 use ptf\Router;
 
 /**
- * 这个文件定义了一系列全局函数，用来操作APP
+ * 这个文件定义了一系列全局函数，用来操作 APP
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
 class Application
@@ -57,6 +57,10 @@ class Application
         $this->router->rules($this->config['routers']);
     }
 
+    /**
+     * 运行框架
+     * @return type
+     */
     public function run()
     {
         $this->init();

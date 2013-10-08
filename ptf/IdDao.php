@@ -3,6 +3,8 @@
 namespace ptf;
 
 /**
+ * 数据库访问基类
+ * 
  * @author ryan
  */
 class IdDao extends Searcher
