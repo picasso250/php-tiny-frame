@@ -80,23 +80,23 @@ class PdoWrapper
     public function update($table, $data, $whereStr = '', $whereVals = array())
     {
         $set = array();
-        $values = array();
+        $vals = array();
         foreach ($data as $key => $value) {
             if (is_int($key)) {
                 $set[] = $value;
             } else {
                 $set[] = "`$key` = ?";
-                $values[] = $value;
+                $vals[] = $value;
             }
         }
-        $set = implode(', ', $set);
+        $set_str = implode(', ', $set);
 
-        $sql = "UPDATE $table SET $set";
+        $sql = "UPDATE $table SET $set_str";
         if ($whereStr) {
             $sql .= " WHERE $whereStr";
         }
         
-        $values = array_merge($values, $whereVals);
+        $values = array_merge($vals, $whereVals);
 
         $statement = self::execute($sql, $values);
         return $statement->rowCount();
@@ -162,17 +162,27 @@ class PdoWrapper
     {
         if ($args) {
             if (is_int(key($args))) {
-                $sql = str_replace('?', '%s', $sql);
-                $args = array_map(function ($p) {return "'$p'";}, array_values($args));
-                array_unshift($args, $sql);
-                $sql = call_user_func_array('sprintf', $args);
+                $sql = self::formatQuestionMarkSql($sql, $args);
             } else {
-                foreach ($args as $key => $value) {
-                    $sql = preg_replace('/:'.$key.'\b/', "'$value'", $sql);
-                }
+                $sql = self::formatNameMarkSql($sql, $args);
             }
         }
         self::$sqls[] = $sql;
+    }
+    
+    private static function formatQuestionMarkSql($sql, $args)
+    {
+        $sql = str_replace('?', "'%s'", $sql);
+        array_unshift($args, $sql);
+        return call_user_func_array('sprintf', $args);
+    }
+    
+    private static function formatNameMarkSql($sql, $args)
+    {
+        foreach ($args as $key => $value) {
+            $sql = preg_replace('/:'.$key.'\b/', "'$value'", $sql);
+        }
+        return $sql;
     }
 
     /**
