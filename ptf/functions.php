@@ -137,45 +137,6 @@ function image_file_resize($tmp_img_file, $image_type, $crop, $new_width, $new_h
     }
 }
 
-// write file content to dst
-function write_upload($content, $file_name) 
-{
-    if (ON_SERVER) {
-        sae_upload($content, $file_name);
-    }
-
-    $root = APP_ROOT.'data/';
-    if (!file_exists($root)) {
-        mkdir($root);
-    }
-    $dst_root = $root .'upload/';
-    if (!file_exists($dst_root)) {
-        mkdir($dst_root);
-    }
-    $year_month_folder = date('Ym');
-    $path = $year_month_folder;
-    if (!file_exists($dst_root.$path)) {
-        mkdir($dst_root.$path);
-    }
-    $date_folder = date('d');
-    $path .= '/'.$date_folder;
-    if (!file_exists($dst_root.$path)) {
-        mkdir($dst_root.$path);
-    }
-    $path .= '/'.$file_name;
-    file_put_contents($dst_root.$path, $content);
-    return ROOT . 'data/upload/' . $path;
-}
-
-function sae_upload$content, $file_name) 
-{
-    $up_domain = UP_DOMAIN;
-    $s = new SaeStorage();
-    $s->write($up_domain , $file_name , $content);
-    return $s->getUrl($up_domain ,$file_name);
-}
-
-
 function file_ext($file_name) 
 {
     $arr = explode('.', $file_name);
@@ -204,25 +165,11 @@ function underscoreToCamelCase($value)
  
 function camelCaseToUnderscore($value) 
 {
-    return preg_replace_callback('/([A-Z])/', function($char) { return '_'.strtolower($char[1]); }, lcfirst($value));
-}
-
-
-// usage: 
-//     $url could be empty, which will go to index, 
-//     could be out link, such "http://google.com"
-//     also could be absulote path, such as "/root/login"
-//     the begining "/" could be omitted
-function redirect($url='') 
-{
-    // 1. out link ==> directly
-    // 2. inner link (without root) ==> add ROOT first
-    // 3. inner link (with root) ==> directly
-    if (strpos($url, 'http') !== 0 && strpos($url, '/') !== 0) { // inner link relatively
-        $url = ROOT . $url;
-    }
-    header('Location:'.$url);
-    exit();
+    return preg_replace_callback(
+        '/([A-Z])/', 
+        function($char) { return '_'.strtolower($char[1]); }, 
+        lcfirst($value)
+    );
 }
 
 function sae_log($msg)

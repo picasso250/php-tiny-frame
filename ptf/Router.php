@@ -1,5 +1,7 @@
 <?php
 
+namespace ptf;
+
 /**
  * 路由类
  * 
@@ -20,7 +22,7 @@ class Router {
      * 调用此函数时执行 action 方法
      * default indexController::indexAction()
      */
-    public function dispath($url)
+    public function dispatch($url)
     {
         $param = array();
         if ($this->rules) {
@@ -82,6 +84,14 @@ class Router {
             return $this->_rule(func_get_arg(0), func_get_arg(1), func_get_arg(2));
         }
     }
+
+    public function rules($rules)
+    {
+        foreach ($rules as $rule) {
+            $this->_rule($rule[0], $rule[1], $rule[2]);
+        }
+    }
+
     private function _rule($method, $rule, $ca)
     {
         if ($rule === '*') {
@@ -97,6 +107,7 @@ class Router {
             'controller' => $ca[0],
             'action' => $ca[1],
         );
+        return $this;
     }
 }
 

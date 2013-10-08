@@ -14,7 +14,8 @@ Very small framework for website write in PHP.
 - 简洁
 - 支持 SAE
 
-这个框架参考了
+**这个框架参考了**
+
 - **鸡爷** 的自用框架，
 - [LazyPHP3](http://ftqq.com/open-source-projects/lazyphp/)
 - [Idiorm](http://j4mie.github.io/idiormandparis/)
@@ -23,13 +24,11 @@ Very small framework for website write in PHP.
 
 在此一并表示感谢。
 
-这个框架有如下特征：
+这个框架有如下 **特征** ：
 
 1. MVC 结构
 2. 自带简单的 ORM
-1. 使用 PHP 做 router
-
-**这个框架还是极端的不成熟，不推荐日常使用。**
+1. 使用 PHP 做路由
 
 文件结构
 ---------------
@@ -40,15 +39,19 @@ Very small framework for website write in PHP.
 
  控制器。
 
-* model
+* dao
  
- 模型层
+ 数据库访问器
+
+* entity
+
+ 数据对象
 
 * view
 
  视图。模版都在里面。
 
-所有的 Model 都需要继承 Model 类，里面有一些基本的增删改查的函数，可以更方便的和数据库交互。
+所有的 Dao 都需要继承 IdDao 类，里面有一些基本的增删改查的函数，可以更方便的和数据库交互。
 
 简明教程
 --------------
@@ -56,17 +59,38 @@ Very small framework for website write in PHP.
 **配置与运行**
 
 ```php
-require __DIR__.'/ptf/autoload.php';
-$app = new PtfApp;
-$app->config(require __DIR__.'/config.php');
+use ptf\Application;
+
+require __DIR__.'/vendor/ptf/autoload.php';
+
+$app = new Application;
+$app->root = __DIR__; // 配置网站的主目录
+$app->config(require __DIR__.'/config.php'); // 配置其他选项
 $app->run();
 ```
 
-在 `config.php` 中，你需要配置各种
+在 `config.php` 中，你需要配置数据库连接信息和路由
 
 ```php
 return array(
-    'db' => array()
+    'db' => array(
+        'dsn' => 'mysql:host=localhost;dbname=weibo',
+        'username' => 'root',
+        'password' => 'root',
+        'debug' => true,
+        'logging' => true,
+    ),
+
+    // 网址=>控制器
+    'routers' => array(
+        array('GET', '/', array('Index', 'index')),
+        array('GET', '/about', array('Index', 'about')),
+        array('GET', '/role/', array('Role', 'index')),
+        array('POST', '/role/', array('Role', 'add')),
+        array('GET', '/role/[:id]', array('Role', 'view')),
+        array('GET', '/role/[:id]/play', array('Role', 'play')),
+        array('POST', '/twit/', array('Twit', 'add')),
+    ),
 );
 ```
 
@@ -76,7 +100,7 @@ return array(
 
 `/group/topic/35708257/`
 
-当用户访问这个网址的时候，我们希望服务器执行我们写的特定代码。这个功能就叫做路由。在ptf中，你需要这样做。
+当用户访问这个网址的时候，我们希望服务器执行我们写的特定代码。这个功能就叫做路由。在 ptf 中，你需要这样做:
 
 ```php
 $router = new Router;
@@ -132,26 +156,41 @@ public function viewAction()
 {
     // 获取数据
     $topicId = $this->id; // $topicId === '35708257'
-    $topic = Topic::findOne($topicId);
+    $topicModel = new TopicModel;
+    $topic = $topicModel->findOne($topicId);
     echo $topic->title;
 }
 ```
 
 `$topic->title` 就是标题，而 `$topic->content` 自然就是内容啦。很简单吧。不过，要想实现这种用面向对象的方式访问数据库，我们首先要写好 Model 层。也就是传说中的 ORM ，也有人叫做 AR。
 
-在 `model` 文件夹里新建一个 `Topic.php`文件。注意，这个类的名称一定要是表名首字母大写。
+在 `dao` 文件夹里新建一个 `TopicDao.php`文件。注意，这个类的名称一定要是表名首字母大写。
 内容如下：
 
 ```php
-class Topic extends IdModel // 继承自 IdModel，这是重点！
+class TopicDao extends IdDao // 继承自 IdDao，这是重点！
+{
+    public $table = 'topic'; // 数据库表名
+}
+```
+
+在 `entity` 文件夹中新建一个 `Topic.php` 的文件。注意，这个类的名称一定要和 `TopicDao` 对应。
+
+```php
+class Topic extends IdEntity
 {
 }
 ```
 
 现在你就拥有一个最基本的 ORM 了。上面的 `viewAction` 方法。已经可以工作了。
 
-render
+**渲染视图**
+
 ```php
+$this->layout('master');
+$this->renderView('index');
+$this->yieldView();
+$this->renderBlock('header', array('name' => $value,...));
 
 ```
 
@@ -178,24 +217,30 @@ CREATE TABLE `comment` (
 
 可以看到，表 `comment` 的 `topic` 字段对应 `topic` 表。
 
-这样之后，我们在 `model` 文件夹下新建一个文件：`Comment.php`
+这样之后，我们在 `dao` 文件夹下新建一个文件：`CommentDao.php`
 
 ```php
-class Comment extends BasicModel 
+class CommentDao extends IdDao 
 {
-    protected $relationMap = array('topic' => 'topic');
 }
 ```
 
-但是，注意，我们 comment 表有一个外键，所以，要写一个 relation map。这个 relation map 的 key 是外键的名称，value 是对应的表名。一般而言，二者是相同的名称。
+在 `entity` 文件夹下新建一个文件： `Comment.php`
+
+```php
+class Comment extends IdEntity
+{
+}
+```
 
 然后，我们想当然的在 `controller` 里这么调用：
 
 ```php
 public function topic()
 {
-    $topic = new Topic($topicId);
-    $comments = $topic->comments();
+    $topicModel = new TopicModel;
+    $topic = $topicModel->findOne($topicId);
+    $comments = $topic->getComments();
 }
 ```
 
@@ -206,11 +251,12 @@ public function topic()
 这个方法是这样的：
 
 ```php
-class Topic extends BasicModel 
+class Topic extends IdEntity 
 {
-    public function comments()
+    public function getComments()
     {
-        return Comment::search()->where('topic', $this)->findMany(); // 这就是见证奇迹的代码
+        $commentDao = new CommentDao;
+        return $commentDao->where('topic_id', $this->id)->findMany(); // 这就是见证奇迹的代码
     }
 }
 ```
@@ -220,7 +266,7 @@ class Topic extends BasicModel
 
 ```php
 $data =
-    Person::search()        // 这是一个搜索者，专门用来获取数据库中的数据。
+    $personDao        // 这是一个Dao，专门用来获取数据库中的数据。
     ->where('key', $value) // 指定搜索条件
     ->findMany()           // 使用 `Searcher::findMany()` 方法获取数据
 ```
@@ -235,6 +281,7 @@ PdoWrapper::config('mysql:host=localhost;dbname=my_database');
 PdoWrapper::config('username', 'database_user');
 PdoWrapper::config('password', 'top_secret');
 ```
+
 还可以用config()方法设置一些其他的选项。
 
 ```php

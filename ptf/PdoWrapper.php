@@ -12,8 +12,9 @@ class PdoWrapper
 {
     protected static $instance;
     protected static $config = array(
-        'debug' => false,
-        'logging' => false,
+            'driver_options' => array(),
+            'debug' => false,
+            'logging' => false,
     );
     protected static $sqls = array();
 
@@ -43,6 +44,9 @@ class PdoWrapper
 
     public static function getDb()
     {
+        if (!self::$instance) {
+            self::$instance = new Pdo(self::$config['dsn'], self::$config['username'], self::$config['password'], self::$config['driver_options']);
+        }
         return self::$instance;
     }
 
@@ -59,9 +63,9 @@ class PdoWrapper
     public function insert($table, $data) 
     {
         $keys = array_keys($data);
-        $keys .= implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
-        $values .= implode(', ', array_map(function ($k) {return ":$k";}, $keys));
-        $sql = "INSERT INTO `$table` ($keys) VALUES ($values)";
+        $keystr = implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
+        $values = implode(', ', array_map(function ($k) {return ":$k";}, $keys));
+        $sql = "INSERT INTO `$table` ($keystr) VALUES ($values)";
         $statement = self::execute($sql, $data);
         return $statement->rowCount();
     }
@@ -102,9 +106,9 @@ class PdoWrapper
      * 
      * @param string $id
      */
-    public function delete($whereStr = '', $whereVals = array()) {
+    public function delete($table, $whereStr = '', $whereVals = array()) {
 
-        $sql = "DELETE FROM `$table()`";
+        $sql = "DELETE FROM `$table`";
         if ($whereStr) {
             $sql .= " WHERE $whereStr";
         }
@@ -125,6 +129,11 @@ class PdoWrapper
         return $statement->fetchAll($fetchType);
     }
 
+    public function lastInsertId()
+    {
+        return self::getDb()->lastInsertId();
+    }
+
     /**
      * 执行一条Sql语句
      */
@@ -133,12 +142,12 @@ class PdoWrapper
             self::logSql($sql, $args);
         }
 
-        $db = static::db();
+        $db = self::getDb();
         $statement = $db->prepare($sql);
-        static::bindValues($statement, $args);
+        self::bindValues($statement, $args);
         $rs = $statement->execute();
         if (!$rs) {
-            if (static::$config['debug']) {
+            if (self::$config['debug']) {
                 var_dump($statement);
                 var_dump($statement->errorInfo());
             }
