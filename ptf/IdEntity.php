@@ -16,6 +16,12 @@ class IdEntity
 
     protected $dirty = array();
 
+    public static function dao()
+    {
+        $classname = get_called_class().'Dao';
+        return new $classname;
+    }
+
     public static function make($model, $row)
     {
         $classname = get_called_class();

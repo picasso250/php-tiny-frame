@@ -124,6 +124,7 @@ class Searcher
             $key = self::backQuote(func_get_arg(0));
             $operator = func_get_arg(1);
             $value = func_get_arg(2);
+            $placeholder = '?';
             if (is_array($value)) {
                 $placeholder = array_map(function ($e) {return '?';}, $value);
                 $placeholder = '(' . implode(', ', $placeholder) . ')';
