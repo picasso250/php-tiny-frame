@@ -50,7 +50,7 @@ class IdEntity
         if ($this->id()) {
             $this->model->update($this);
         } else {
-            $this->row[$this->model->pkey()] = $this->model->insert($this);
+            $this->id = $this->row[$this->model->pkey()] = $this->model->insert($this);
         }
         $this->clean();
         return $this;

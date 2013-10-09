@@ -85,6 +85,15 @@ class Controller
         return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
     }
 
+    public function renderJson($is_success)
+    {
+        $ret['s'] = $is_success ? 1 : 0;
+        if (func_num_args() == 2) {
+            $ret[$is_success ? 'data' : 'error'] = func_get_arg(1);
+        }
+        echo json_encode($ret);
+    }
+
     public function layout($tpl)
     {
         $this->layout = $tpl;
