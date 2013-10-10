@@ -47,18 +47,8 @@ class Controller
         if ($num_args == 1) {
             $args = func_get_arg(0);
             if (is_array($args)) {
-                $ret = array();
-                foreach ($args as $a => $b) {
-                    if (is_int($a)) {
-                        $name = $b;
-                        $default = null;
-                    } else {
-                        $name = $a;
-                        $default = $b;
-                    }
-                    $ret[$name] = $this->_param($name, $default);
-                }
-                return $ret;
+                $names = $args;
+                return $this->paramMulti($names);
             } elseif (is_string($args)) {
                 $name = $args;
                 return $this->_param($name, null);
@@ -70,6 +60,22 @@ class Controller
         } else {
             return $_REQUEST;
         }
+    }
+    
+    protected function paramMulti($names)
+    {
+        $ret = array();
+        foreach ($names as $a => $b) {
+            if (is_int($a)) {
+                $name = $b;
+                $default = null;
+            } else {
+                $name = $a;
+                $default = $b;
+            }
+            $ret[$name] = $this->_param($name, $default);
+        }
+        return $ret;
     }
 
     public function paramFile($name)
@@ -99,6 +105,10 @@ class Controller
         $this->layout = $tpl;
     }
     
+    /**
+     * 渲染视图
+     * @param string $tpl 模版路径
+     */
     public function renderView($tpl)
     {
         if ($this->layout) {
@@ -115,6 +125,11 @@ class Controller
         include "$this->view_root/$this->view.phtml";
     }
 
+    /**
+     * 渲染html块
+     * @param string $tpl 模版路径
+     * @param array $data 内部变量
+     */
     public function renderBlock($tpl, $data = array())
     {
         foreach ($data as $key => $value) {
@@ -123,11 +138,19 @@ class Controller
         include "$this->view_root/$tpl.phtml";
     }
 
+    /**
+     * 添加js
+     * @param string $js
+     */
     public function addScript($js)
     {
         $this->scripts[] = $js;
     }
 
+    /**
+     * 添加css
+     * @param string $css
+     */
     public function addStyle($css)
     {
         $this->styles[] = $css;
@@ -139,9 +162,13 @@ class Controller
         exit;
     }
 
+    /**
+     * 获取客户端 IP
+     * @return string
+     */
     public function ip()
     {
-        return $_SERVER['REMOTE_ADDR'];
+        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unkown';
     }
 
     

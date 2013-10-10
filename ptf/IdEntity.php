@@ -10,7 +10,7 @@ namespace ptf;
  */
 class IdEntity
 {
-    protected $model; // model object
+    protected $model; // model object, for now, it is dao
     protected $row = array(); // data
     protected $id = 0;
 
@@ -78,7 +78,7 @@ class IdEntity
 
     public function delete()
     {
-        return $this->model->delete($this->id());
+        return $this->model->delete($this);
     }
 
     public function toArray()
@@ -109,15 +109,22 @@ class IdEntity
         if ($num_args == 1) {
             $arr = func_get_arg(0);
             if (is_array($arr)) {
-                foreach ($arr as $key => $value) {
-                    $this->_set($key, $value);
-                }
+                $this->setMulti($arr);
             }
         } elseif ($num_args == 2) {
             $key = func_get_arg(0);
             $value = func_get_arg(1);
             $this->_set($key, $value);
         }
+        return $this;
+    }
+    
+    public function setMulti($arr)
+    {
+        foreach ($arr as $key => $value) {
+            $this->_set($key, $value);
+        }
+        return $this;
     }
 
     public function _set($key, $value)
@@ -134,6 +141,7 @@ class IdEntity
     public function __set($key, $value)
     {
         $this->_set($key, $value);
+        return $value;
     }
 
     public function __get($key)

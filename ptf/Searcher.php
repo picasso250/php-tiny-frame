@@ -174,16 +174,16 @@ class Searcher
     protected function whereOpArray($key, $op, $arr)
     {
         $key = self::backQuote($key);
-        if (is_array($value)) {
-            $placeholder = array_map(function ($e) {return '?';}, $value);
-            $placeholder = implode(', ', $placeholder);
+        if (is_array($arr)) {
+            $ph = array_map(function ($e) {return '?';}, $arr);
+            $placeholder = implode(', ', $ph);
         }
 
-        if (!is_array($value)) {
-            $value = array($value);
+        if (!is_array($arr)) {
+            $arr = array($arr);
         }
 
-        $this->wheres[] = array("$key $op ($placeholder)", $value);
+        $this->wheres[] = array("$key $op ($placeholder)", $arr);
         return $this;
     }
 
@@ -290,20 +290,20 @@ class Searcher
     protected function havingOpArray($key, $op, $arr)
     {
         $key = self::backQuote($key);
-        if (is_array($value)) {
-            $placeholder = array_map(function ($e) {return '?';}, $value);
-            $placeholder = implode(', ', $placeholder);
+        if (is_array($arr)) {
+            $ph = array_map(function ($e) {return '?';}, $arr);
+            $placeholder = implode(', ', $ph);
         }
 
-        if (!is_array($value)) {
-            $value = array($value);
+        if (!is_array($arr)) {
+            $arr = array($arr);
         }
 
-        $this->havings[] = array("$key $op ($placeholder)", $value);
+        $this->havings[] = array("$key $op ($placeholder)", $arr);
         return $this;
     }
 
-    public function orderBy($exp)
+    public function orderBy()
     {
         $arg_num = func_num_args();
         if ($arg_num == 1) {

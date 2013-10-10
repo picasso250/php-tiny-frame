@@ -33,10 +33,11 @@ class IdDao extends Searcher
     public function pkey()
     {
         $defaultPrimaryKey = 'id';
-        if (isset($this->pkey))
+        if (isset($this->pkey)) {
             return $this->pkey;
-        else 
+        } else {
             return $defaultPrimaryKey;
+        }
     }
 
     public function insert(IdEntity $entity)
@@ -54,7 +55,7 @@ class IdDao extends Searcher
         return 0;
     }
 
-    public function delete()
+    public function delete(IdEntity $entity)
     {
         return PdoWrapper::delete($this->table(), "`{$this->pkey()}`=?", array($entity->id()));
     }
