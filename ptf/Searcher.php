@@ -111,6 +111,7 @@ class Searcher
                     }
                 }
             }
+            return $this;
         } elseif ($arg_num == 2) {
             $key = (func_get_arg(0));
             $value = func_get_arg(1);
