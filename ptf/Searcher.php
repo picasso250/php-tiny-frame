@@ -126,7 +126,7 @@ class Searcher
             $value = func_get_arg(2);
             $placeholder = '?';
             if (is_array($value)) {
-                $placeholder = array_map(function ($e) {return '?';}, $value);
+                $placeholder = array_map(function () {return '?';}, $value);
                 $placeholder = '(' . implode(', ', $placeholder) . ')';
             }
             if (!is_array($value)) {
@@ -175,7 +175,7 @@ class Searcher
     {
         $key = self::backQuote($key);
         if (is_array($arr)) {
-            $ph = array_map(function ($e) {return '?';}, $arr);
+            $ph = array_map(function () {return '?';}, $arr);
             $placeholder = implode(', ', $ph);
         }
 
@@ -242,7 +242,7 @@ class Searcher
             $operator = func_get_arg(1);
             $value = func_get_arg(2);
             if (is_array($value)) {
-                $placeholder = array_map(function ($e) {return '?';}, $value);
+                $placeholder = array_map(function () {return '?';}, $value);
                 $placeholder = '(' . implode(', ', $placeholder) . ')';
             }
             if (!is_array($value)) {
@@ -291,7 +291,7 @@ class Searcher
     {
         $key = self::backQuote($key);
         if (is_array($arr)) {
-            $ph = array_map(function ($e) {return '?';}, $arr);
+            $ph = array_map(function () {return '?';}, $arr);
             $placeholder = implode(', ', $ph);
         }
 
@@ -497,13 +497,13 @@ class Searcher
         if ($arg_num == 1) {
             $args = func_get_arg(0);
             if (is_array($args)) {
-                foreach ($a as $key => $value) {
+                foreach ($args as $key => $value) {
                     $this->groupbys[] = self::backQuote($value);
                 }
             }
         } elseif ($arg_num > 1) {
             $args = func_get_args();
-            foreach ($a as $key => $value) {
+            foreach ($arg_num as $key => $value) {
                 if (preg_match('/^\w+$/', $value)) {
                     $this->groupbys[] = self::backQuote($value);
                 } else {
