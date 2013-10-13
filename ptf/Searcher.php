@@ -116,23 +116,19 @@ class Searcher
             $value = func_get_arg(1);
             // 支持=和in操作符
             if (is_array($value)) {
-                $this->whereIn($key, $value);
+                return $this->whereIn($key, $value);
             } else {
-                $this->whereEqual($key, $value);
+                return $this->whereEqual($key, $value);
             }
         } elseif ($arg_num == 3) {
-            $key = self::backQuote(func_get_arg(0));
+            $key = func_get_arg(0);
             $operator = func_get_arg(1);
             $value = func_get_arg(2);
-            $placeholder = '?';
             if (is_array($value)) {
-                $placeholder = array_map(function () {return '?';}, $value);
-                $placeholder = '(' . implode(', ', $placeholder) . ')';
+                return $this->whereOpArray($key, $operator, $value);
+            } else {
+                return $this->whereOpValue($key, $operator, $value);
             }
-            if (!is_array($value)) {
-                $value = array($value);
-            }
-            $this->wheres[] = array("$key $operator $placeholder", $value);
         }
         return $this;
     }
@@ -170,20 +166,17 @@ class Searcher
     {
         return $this->whereOpArray($key, 'NOT IN', $value);
     }
+    
+    protected function whereOpValue($key, $operator, $value)
+    {
+        $key = self::backQuote($key);
+        $this->wheres[] = array("$key $operator ?", array($value));
+        return $this;
+    }
 
     protected function whereOpArray($key, $op, $arr)
     {
-        $key = self::backQuote($key);
-        if (is_array($arr)) {
-            $ph = array_map(function () {return '?';}, $arr);
-            $placeholder = implode(', ', $ph);
-        }
-
-        if (!is_array($arr)) {
-            $arr = array($arr);
-        }
-
-        $this->wheres[] = array("$key $op ($placeholder)", $arr);
+        $this->wheres[] = self::getCondOpArray($key, $op, $arr);
         return $this;
     }
 
@@ -242,13 +235,10 @@ class Searcher
             $operator = func_get_arg(1);
             $value = func_get_arg(2);
             if (is_array($value)) {
-                $placeholder = array_map(function () {return '?';}, $value);
-                $placeholder = '(' . implode(', ', $placeholder) . ')';
+                return $this->havingOpArray($key, $operator, $value);
+            } else {
+                return $this->havingOpValue($key, $operator, $value);
             }
-            if (!is_array($value)) {
-                $value = array($value);
-            }
-            $this->havings[] = array("$key $operator $placeholder", $value);
         }
         return $this;
     }
@@ -287,20 +277,31 @@ class Searcher
         return $this->havingOpArray($key, 'NOT IN', $value);
     }
 
-    protected function havingOpArray($key, $op, $arr)
+    protected function havingOpValue($key, $operator, $value)
     {
         $key = self::backQuote($key);
+        $this->havings[] = array("$key $operator ?", array($value));
+        return $this;
+    }
+    
+    protected function havingOpArray($key, $operator, $arr)
+    {
+        $this->havings[] = self::getCondOpArray($key, $operator, $arr);
+        return $this;
+    }
+    
+    private static function getCondOpArray($key, $op, $arr)
+    {
         if (is_array($arr)) {
-            $ph = array_map(function () {return '?';}, $arr);
-            $placeholder = implode(', ', $ph);
+            $placeholder = implode(',', self::toQuestionMarkArray($arr));
         }
 
         if (!is_array($arr)) {
             $arr = array($arr);
         }
 
-        $this->havings[] = array("$key $op ($placeholder)", $arr);
-        return $this;
+        $key = self::backQuote($key);
+        return array("$key $op ($placeholder)", $arr);
     }
 
     public function orderBy()
@@ -640,5 +641,10 @@ class Searcher
         $this->distinct = false;
         $this->limit = null;
         $this->offset = null;
+    }
+    
+    private static function toQuestionMarkArray($arr)
+    {
+        return array_map(function () {return '?';}, $arr ?: array());
     }
 }
