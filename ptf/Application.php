@@ -6,7 +6,8 @@ use \Exception;
 use ptf\Router;
 
 /**
- * 这个文件定义了一系列全局函数，用来操作 APP
+ * 程序
+ * 用来操作 APP
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
 class Application
@@ -20,6 +21,10 @@ class Application
         $this->config = $config;
     }
 
+    /**
+     * 初始化
+     * @return type
+     */
     public function init()
     {
         ob_start();
@@ -112,7 +117,13 @@ class Application
         return true;
     }
 
-    public function saeUpload($content, $file_name)
+    /**
+     * 将文件内容写到到SAE
+     * @param string $content 文件内容
+     * @param string $file_name 文件名
+     * @return string 上传后的地址
+     */
+    public function putContentsToSae($content, $file_name = null)
     {
         $up_domain = UP_DOMAIN;
         $s = new SaeStorage();

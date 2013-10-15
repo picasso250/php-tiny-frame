@@ -19,6 +19,11 @@ class Controller
     private $scripts = array();
     private $styles = array();
 
+    /**
+     * 获取类属性
+     * @param string $key
+     * @return mixed 如无，返回null
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->vars)) {
@@ -32,12 +37,17 @@ class Controller
         return null;
     }
 
+    /**
+     * 给类属性赋值
+     * @param string $key
+     * @param mixed $value 如果是一个函数，则为懒加载服务
+     */
     public function __set($key, $value)
     {
         if (is_callable($value)) {
-            $this->lazies['names'][$key] = $value;
+            return $this->lazies['names'][$key] = $value;
         } else {
-            $this->vars[$key] = $value;
+            return $this->vars[$key] = $value;
         }
     }
 
@@ -170,6 +180,5 @@ class Controller
     {
         return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unkown';
     }
-
     
 }
