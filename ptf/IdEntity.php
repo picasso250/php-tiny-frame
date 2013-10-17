@@ -12,7 +12,7 @@ class IdEntity
 {
     protected $model; // model object, for now, it is dao
     protected $row = array(); // data
-    protected $id = 0;
+    protected $id;
 
     protected $dirty = array();
 
@@ -59,10 +59,10 @@ class IdEntity
     public function id()
     {
         $pkey = $this->model->pkey();
-        if (!isset($this->row[$pkey])) {
-            return 0;
+        if (isset($this->row[$pkey])) {
+            return $this->row[$pkey];
         }
-        return $this->row[$pkey];
+        return null;
     }
 
     /**
