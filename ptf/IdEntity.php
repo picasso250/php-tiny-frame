@@ -129,6 +129,11 @@ class IdEntity
         return $ret;
     }
 
+    /**
+     * 获取对应的属性
+     * @param type $name
+     * @return null
+     */
     public function get($name)
     {
         if (isset($this->row) && isset($this->row[$name])) {
@@ -137,6 +142,10 @@ class IdEntity
         return null;
     }
 
+    /**
+     * 设置对应的属性
+     * @return \ptf\IdEntity
+     */
     public function set()
     {
         $num_args = func_num_args();
@@ -153,7 +162,13 @@ class IdEntity
         return $this;
     }
     
-    public function setMulti($arr)
+    /**
+     * 同时设置多个属性
+     * 貌似大家都叫populate来着
+     * @param array $arr
+     * @return \ptf\IdEntity
+     */
+    public function setMulti(array $arr)
     {
         foreach ($arr as $key => $value) {
             $this->_set($key, $value);
@@ -167,7 +182,12 @@ class IdEntity
         $this->dirty[] = $key;
     }
 
-    public function fillWith($data)
+    /**
+     * 填充数据
+     * 或许这个方法叫做populate
+     * @param array $data
+     */
+    public function fillWith(array $data)
     {
         $this->row = $data;
     }
