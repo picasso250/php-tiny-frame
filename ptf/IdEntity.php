@@ -5,7 +5,7 @@ namespace ptf;
 /**
  * 实体基类
  * 
- * represents a row in a tabel
+ * represents a row in a table
  * @author ryan
  */
 class IdEntity
