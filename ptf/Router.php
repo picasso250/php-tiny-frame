@@ -28,8 +28,8 @@ class Router {
         if ($this->rules) {
             // 解析规则（阻断性）
             foreach ($this->rules as $rule) {
-                $method_match = $rule['method'] === null || in_array($_SERVER['REQUEST_METHOD'], $rule['method']);
-                if ($method_match && preg_match($rule['regex'], $url, $matches)) {
+                $is_method_match = $this->macthMethod($rule['methods']);
+                if ($is_method_match && preg_match($rule['regex'], $url, $matches)) {
                     
                     // 提取参量
                     foreach ($matches as $key => $value) {
@@ -41,10 +41,6 @@ class Router {
 
                     $controller = $rule['controller'];
                     $action = $rule['action'];
-                    foreach ($rule['names'] as $name) {
-                        $controller = preg_replace('/\{\$'.$name.'\}/', $param[$name], $controller);
-                        $action = preg_replace('/\{\$'.$name.'\}/', $param[$name], $action);
-                    }
 
                     break;
                 }
@@ -59,6 +55,16 @@ class Router {
         }
         $result = array(array($controller, $action), $param);
         return $result;
+    }
+    
+    public function macthMethod($methods) {
+        if ($methods == NULL) {
+            return TRUE;
+        }
+        if (in_array($_SERVER['REQUEST_METHOD'], $methods)) {
+            return TRUE;
+        }
+        return false;
     }
 
     /**
@@ -101,7 +107,7 @@ class Router {
         }
         preg_match_all('/\[:([a-zA-Z][a-zA-Z\d_]*)\]/', $rule, $matches);
         $this->rules[] = array(
-            'method' => is_string($method) ? array($method) : $method,
+            'methods' => is_string($method) ? array($method) : $method,
             'regex' => '/^'.str_replace('/', '\/', $regex).'$/',
             'names' => $matches[1],
             'controller' => $ca[0],
