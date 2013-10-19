@@ -8,6 +8,7 @@ use ptf\Router;
 /**
  * 程序
  * 用来操作 APP
+ * @example $app = new Appplication();$app->run();
  * @author  ryan <cumt.xiaochi@gmail.com>
  */
 class Application
@@ -70,16 +71,14 @@ class Application
     {
         $this->init();
 
-        $req_uri = reset(explode('?', $_SERVER['REQUEST_URI']));
+        $req_uri = $this->getRequestUri();
 
         list($call, $param) = $this->router->dispatch($req_uri);
         if (is_array($call)) {
             $class = $call[0].'Controller';
             $func = $call[1].'Action';
-            $c = new $class;
-            $c->view_root = "$this->root/view";
-            $c->config = $this->config;
-            $c->app = $this;
+            $this->view_root = "$this->root/view";
+            $c = new $class($this);
             if (method_exists($c, 'init')) {
                 $c->init();
             }
@@ -93,16 +92,9 @@ class Application
     }
 
     // write file content to dst
-    public function writeUpload($content, $file_name) {
-        if (isset($_SERVER['HTTP_APPNAME'])) {
-            return saeUpload($content, $file_name);
-        } else {
-            $dir = "/data/upload/".date('Ymd');
-            $absolute_dir = $this->root.$dir;
-            $this->mkdir($absolute_dir);
-            file_put_contents("$absolute_dir/$file_name", $content);
-            return "$dir/$file_name";
-        }
+    public function getRequestUri() {
+        $arr = explode('?', $_SERVER['REQUEST_URI']);
+        return $arr[0];
     }
     
     protected function mkdir($dir)
@@ -119,15 +111,15 @@ class Application
 
     /**
      * 将文件内容写到到SAE
+     * @param string $domain 域
      * @param string $content 文件内容
      * @param string $file_name 文件名
      * @return string 上传后的地址
      */
-    public function putContentsToSae($content, $file_name = null)
+    public function putContentsToSae($domain, $content, $file_name = null)
     {
-        $up_domain = UP_DOMAIN;
         $s = new SaeStorage();
-        $s->write($up_domain , $file_name , $content);
-        return $s->getUrl($up_domain ,$file_name);
+        $s->write($domain , $file_name , $content);
+        return $s->getUrl($domain ,$file_name);
     }
 }

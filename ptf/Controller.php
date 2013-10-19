@@ -18,6 +18,12 @@ class Controller
 
     private $scripts = array();
     private $styles = array();
+    
+    public function __construct($app) {
+        $this->view_root = $app->view_root;
+        $this->config = $app->config;
+        $this->app = $app;;
+    }
 
     /**
      * 获取类属性
