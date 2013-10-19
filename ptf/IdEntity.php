@@ -11,7 +11,7 @@ namespace ptf;
 class IdEntity
 {
     protected $model; // model object, for now, it is dao
-    protected $row = array(); // data
+    protected $data = array(); // data
     protected $id;
 
     protected $dirty = array();
@@ -38,7 +38,7 @@ class IdEntity
         $o = new $classname;
         $o->model = $model;
         if ($row) {
-            $o->row = $row;
+            $o->data = $row;
             $o->id = $row[$model->pkey()];
         }
         return $o;
@@ -47,7 +47,7 @@ class IdEntity
     public static function fromArray($arr)
     {
         $o = new self;
-        $o->row = $arr;
+        $o->data = $arr;
         $o->id = $arr[$this->model->pkey()];
         return $o;
     }
@@ -59,8 +59,8 @@ class IdEntity
     public function id()
     {
         $pkey = $this->model->pkey();
-        if (isset($this->row[$pkey])) {
-            return $this->row[$pkey];
+        if (isset($this->data[$pkey])) {
+            return $this->data[$pkey];
         }
         return null;
     }
@@ -74,7 +74,7 @@ class IdEntity
         if ($this->id()) {
             $this->model->update($this);
         } else {
-            $this->id = $this->row[$this->model->pkey()] = $this->model->insert($this);
+            $this->id = $this->data[$this->model->pkey()] = $this->model->insert($this);
         }
         $this->clean();
         return $this;
@@ -88,7 +88,7 @@ class IdEntity
     {
         $set = array();
         foreach ($this->dirty as $key) {
-            $set[$key] = $this->row[$key];
+            $set[$key] = $this->data[$key];
         }
         return $set;
     }
@@ -117,16 +117,7 @@ class IdEntity
      */
     public function toArray()
     {
-        $num_args = func_num_args();
-        if ($num_args == 0) {
-            return $this->row;
-        }
-        
-        $names = func_get_args();
-        foreach ($names as $name) {
-            $ret[$name] = $this->row[$name];
-        }
-        return $ret;
+        return $this->data;
     }
 
     /**
@@ -136,8 +127,8 @@ class IdEntity
      */
     public function get($name)
     {
-        if (isset($this->row) && isset($this->row[$name])) {
-            return $this->row[$name];
+        if (isset($this->data) && isset($this->data[$name])) {
+            return $this->data[$name];
         }
         return null;
     }
@@ -178,7 +169,7 @@ class IdEntity
 
     public function _set($key, $value)
     {
-        $this->row[$key] = $value;
+        $this->data[$key] = $value;
         $this->dirty[] = $key;
     }
 
@@ -189,7 +180,7 @@ class IdEntity
      */
     public function fillWith(array $data)
     {
-        $this->row = $data;
+        $this->data = $data;
     }
 
     public function __set($key, $value)
