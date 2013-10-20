@@ -1,1 +1,6 @@
 .svn
+
+# for Eclipse
+.buildpath
+.project
+.settings/
