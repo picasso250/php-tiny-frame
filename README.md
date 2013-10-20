@@ -5,14 +5,15 @@ Small framework for website write in PHP.
 
 一个简单的 PHP 框架。使用 MVC 模式。支持 SAE 。
 
-（我猜很多 PHP 程序员都做过这种事情，写了个小框架，然后慢慢放弃，转而使用别人的框架（比较大的）。或许这就是成长？）
+一个人的力量毕竟有限，希望大家可以帮助我完善这个框架。
 
-**我的目的**
+这个框架有如下 **特征** ：
 
-- 我自己用的顺手
-- 运行效率比较高的框架
-- 简洁
-- 支持 SAE
+1. MVC 结构
+2. 自带简单的 ORM
+1. 自带路由
+4. 运行效率较高
+5. 支持 SAE
 
 **这个框架参考了**
 
@@ -23,12 +24,6 @@ Small framework for website write in PHP.
 - [Zend FrameWork 2](http://framework.zend.com/)
 
 在此一并表示感谢。
-
-这个框架有如下 **特征** ：
-
-1. MVC 结构
-2. 自带简单的 ORM
-1. 使用 PHP 做路由
 
 文件结构
 ---------------
