@@ -12,9 +12,15 @@ namespace ptf;
 class Router {
 
     private $rules = array();
+    private $segment;
 
     public function __construct()
     {
+    }
+
+    public function setDefaultSegmentRouter($num = 2)
+    {
+        $this->segment = $num;
     }
 
     /**
@@ -24,7 +30,37 @@ class Router {
      */
     public function dispatch($url)
     {
-        $param = array();
+        if ($this->segment !== null) {
+            return $this->dispatchBySegment($url);
+        } else {
+            return $this->dispatchByRule($url);
+        }
+    }
+    public function dispatchBySegment($url)
+    {
+        if ($this->segment == 1) {
+            $controller = 'index';
+            $action = isset($url) && $url ? $url : 'index';
+            $result = array(array($controller, $action), array());
+            return $result;
+        } elseif ($this->segment == 2) {
+            return $this->dispatchDefault($url);
+        }
+    }
+    public function dispatchDefault($url)
+    {
+        // 默认的路由规则 /controller/action
+        // 默认 404 page404Controller::indexAction()
+        $arr = explode('/', $url);
+        unset($arr[0]);
+        $controller = isset($arr[1]) && $arr[1] ? $arr[1] : 'index';
+        $action = isset($arr[2]) && $arr[2] ? $arr[2] : 'index';
+        $result = array(array($controller, $action), array());
+        return $result;
+    }
+    public function dispatchByRule($url)
+    {
+        $params = array();
         if ($this->rules) {
             // 解析规则（阻断性）
             foreach ($this->rules as $rule) {
@@ -35,7 +71,7 @@ class Router {
                     foreach ($matches as $key => $value) {
                         if ($key) {
                             $name = $rule['names'][$key-1];
-                            $param[$name] = $value;
+                            $params[$name] = $value;
                         }
                     }
 
@@ -46,14 +82,9 @@ class Router {
                 }
             }
         } else {
-            // 默认的路由规则 /controller/action
-            // 默认 404 page404Controller::indexAction()
-            $arr = explode('/', $url);
-            unset($arr[0]);
-            $controller = isset($arr[1]) && $arr[1] ? $arr[1] : 'index';
-            $action = isset($arr[2]) && $arr[2] ? $arr[2] : 'index';
+            return $this->dispatchDefault();
         }
-        $result = array(array($controller, $action), $param);
+        $result = array(array($controller, $action), $params);
         return $result;
     }
     
