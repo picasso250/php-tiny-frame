@@ -70,19 +70,49 @@ class Searcher
         $this->alias = "`$alias`";
     }
 
+    protected function _where($arr, $combine = 'AND')
+    {
+        // 解析where数组
+        foreach ($arr as $key => $value) {
+            if (is_int($key) && is_string($value)) {
+                // 支持直接使用 sql 表达式
+                if (is_string($value)) {
+                    $this->whereExpr($value);
+                }
+            } else {
+                // 支持=和in操作符
+                if (is_array($value)) {
+                    $this->whereIn($key, $value);
+                } else {
+                    $this->whereEqual($key, $value);
+                }
+            }
+        }
+        return $this;
+    }
+
     /**
      * 对应sql中的where
      * 
      * @example
      *     where('username', 'Jack') // WHERE `username` = 'Jack'
-     *     where(array('id' => 3)) // WHERE `id` = '3'
-     *     where(array('id' => array(3, 7, 11))) // WHERE `id` in ('3', '7', '11')
-     *     where('id', 'not in', array(3, 7, 11)) // WHERE `id` not in ('3', '7', '11')
-     *     where(array('(id=3 or id=4)', 'status' => 1)) // WHERE (id=3 or id=4) and `status` = '1'
+     *     where(array('id' => 3, 'gender' => 'male')) // WHERE `id` = '3' AND `gender` = 'male'
+     *     where(array('id' => 3, 'gender' => 'male'), 'or') // WHERE `id` = '3' OR `gender` = 'male'
+     *     where(array('id' => array(3, 7, 11))) // WHERE `id` IN ('3', '7', '11')
+     *     where('id', 'not in', array(3, 7, 11)) // WHERE `id` NOT IN ('3', '7', '11')
+     *     where('id=3') // where id=3
      */
     public function where()
     {
         $arg_num = func_num_args();
+
+        if ($arg_num >= 1 && is_array(func_get_arg(0))) {
+            if ($arg_num == 1) {
+                return $this->_where(func_get_arg(0), 'AND');
+            } else {
+                return $this->_where(func_get_arg(0), strtoupper(trim(func_get_arg(1))));
+            }
+        }
 
         if ($arg_num == 1) { // where(array(key=>value,...))
             $a = func_get_arg(0);
@@ -92,30 +122,10 @@ class Searcher
                 $this->wheres[] = array($a, array());
                 return $this;
             }
-
-            // 解析where数组
-            foreach ($a as $key => $value) {
-                if (is_int($key)) {
-                    // 支持直接使用sql表达式，以及带参数的sql表达式
-                    if (is_string($value)) {
-                        $this->whereExpr($value);
-                    } elseif (is_array($value)) {
-                        $this->whereExpr($value[0], $value[1]);
-                    }
-                } else {
-                    // 支持=和in操作符
-                    if (is_array($value)) {
-                        $this->whereIn($key, $value);
-                    } else {
-                        $this->whereEqual($key, $value);
-                    }
-                }
-            }
-            return $this;
         } elseif ($arg_num == 2) {
             $key = (func_get_arg(0));
             $value = func_get_arg(1);
-            // 支持=和in操作符
+            // 支持 = 和 in 操作符
             if (is_array($value)) {
                 return $this->whereIn($key, $value);
             } else {
@@ -142,6 +152,9 @@ class Searcher
      */
     public function whereExpr($expr, $values = array()) 
     {
+        if (!is_array($values)) {
+            $values = array($values);
+        }
         $this->wheres[] = array("($expr)", $values);
         return $this;
     }
