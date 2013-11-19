@@ -70,6 +70,21 @@ class PdoWrapper
         $statement = self::execute($sql, $data);
         return $statement->rowCount();
     }
+    public function insertMulti($table, $data) 
+    {
+        $keys = array_keys(reset($data));
+        $keystr = implode(', ', array_map(function ($k) {return "`$k`";}, $keys));
+        $values = implode(', ', array_map(function ($k) {return "?";}, $keys));
+        $values = implode(', ', array_fill(0, count($data), "($values)"));
+        $sql = "INSERT INTO `$table` ($keystr) VALUES ($values)";
+        foreach ($data as $row) {
+            foreach ($row as $v) {
+                $d[] = $v;
+            }
+        }
+        $statement = self::execute($sql, $d);
+        return $statement->rowCount();
+    }
 
     /**
      * 更新
@@ -107,7 +122,8 @@ class PdoWrapper
      * 
      * @param string $id
      */
-    public function delete($table, $whereStr = '', $whereVals = array()) {
+    public function delete($table, $whereStr = '', $whereVals = array()) 
+    {
 
         $sql = "DELETE FROM `$table`";
         if ($whereStr) {
