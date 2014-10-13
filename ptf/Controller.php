@@ -1,7 +1,5 @@
 <?php
 
-namespace ptf;
-
 /**
  * 控制器基类
  * get set 可以设置懒加载的服务
@@ -9,6 +7,19 @@ namespace ptf;
  */
 class Controller
 {
+    public function beforeFilter($name, $opts)
+    {
+
+    }
+
+    public function afterFilter($name, $opts)
+    {
+        
+    }
+    public function missingMethod($parameters = array())
+    {
+        //
+    }
     public $view_root;
     public $config;
     public $app;
