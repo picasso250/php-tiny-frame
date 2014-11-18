@@ -54,4 +54,3 @@ $app->run();
 ```
 
 这样就新建了一个路由规则，用户访问指定的网址时，服务器将会加载 `GroupController` 类，并调用 `viewTopicAction` 方法。路由规则中的 `(?<id>\d+)` 代表参数，将会以关联数组的形式传递给 `viewTopicAction(['id' => $id])` 方法。
-
