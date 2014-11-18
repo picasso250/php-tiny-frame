@@ -44,6 +44,7 @@ class Application
         }
 
         $class = $controller.'Controller';
+        require "controller/$class.php";
         $func = $action.'Action';
         $c = new $class();
         if (method_exists($c, 'init')) {
