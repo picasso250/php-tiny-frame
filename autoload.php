@@ -1,6 +1,9 @@
 <?php
+
+require __DIR__.'/ptf/lib.php';
 spl_autoload_register(function ($name) {
-    if (preg_match('/^ptf\b/', $name)) {
-        require __DIR__.'/'.str_replace('\\', '/', $name).'.php';
+	$f = __DIR__.'/ptf/'.str_replace('\\', '/', $name).'.php';
+    if (is_file($f)) {
+        require $f;
     }
 });
