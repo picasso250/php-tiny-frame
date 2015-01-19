@@ -74,3 +74,16 @@ function redirect($url)
 {
     header("Location: $url");
 }
+
+function _get($name, $default = null)
+{
+    return isset($_GET[$name]) ? $_GET[$name] : $default;
+}
+function _post($name, $default = null)
+{
+    return isset($_POST[$name]) ? $_POST[$name] : $default;
+}
+function _req($name, $default = null)
+{
+    return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $default;
+}
