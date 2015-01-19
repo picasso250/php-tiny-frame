@@ -69,3 +69,8 @@ function render($file, $data = [], $layout = null)
         include $file;
     }
 }
+
+function redirect($url)
+{
+    header("Location: $url");
+}
