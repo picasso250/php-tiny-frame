@@ -42,8 +42,8 @@ function run($rules, $page404 = null)
 
     $params = array();
     // 解析规则（阻断性）
-    foreach ($this->rules as $rule) {
-        if ($_SERVER['REQUEST_METHOD'] === $rule[0] && preg_match($rule[1], $url, $params)) {
+    foreach ($rules as $rule) {
+        if ($_SERVER['REQUEST_METHOD'] === $rule[0] && preg_match($rule[1], $uri, $params)) {
             if (isset($rule[3])) {
                 $before = $rule[3];
                 if ($before() === false) {
