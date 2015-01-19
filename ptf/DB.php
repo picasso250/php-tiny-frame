@@ -57,7 +57,8 @@ class DB
             return ":$field";
         }, $keys));
         $sql = "insert into $table ($columns)values($value_str)";
-        return $this->execute($sql, $values);
+        $this->execute($sql, $values);
+        return $this->lastInsertId();
     }
     public function __call($name, $args)
     {
