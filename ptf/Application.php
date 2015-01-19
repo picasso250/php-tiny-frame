@@ -14,7 +14,7 @@ use ptf\Router;
 class Application
 {
     /**
-     * ['GET', '%^get/(\d+)$%', 'Index', 'getItem']
+     * ['GET', '%^get/(\d+)$%', function]
      * @var $rules
      */
     public $rules = array();
@@ -32,25 +32,14 @@ class Application
             // 解析规则（阻断性）
             foreach ($this->rules as $rule) {
                 if ($this->macthMethod($rule[0]) && preg_match($rule[1], $url, $params)) {
-                    $controller = $rule[2];
-                    $action = $rule[3];
+                    $func = $rule[2];
+                    return $func($params);
                     break;
                 }
             }
         } else {
-            $controller = 'index';
-            $action = 'code404';
-            $params = [];
+            return $this->page404();
         }
-
-        $class = $controller.'Controller';
-        require "controller/$class.php";
-        $func = $action.'Action';
-        $c = new $class();
-        if (method_exists($c, 'init')) {
-            $c->init();
-        }
-        return $c->{$func}($params);
     }
 
     public function macthMethod($method) {
@@ -63,10 +52,20 @@ class Application
         return false;
     }
 
-    // write file content to dst
     public function getRequestUri() {
         $arr = explode('?', $_SERVER['REQUEST_URI']);
         return $arr[0];
+    }
+
+    public function render($file, $data = [], $layout = null)
+    {
+        extract($data);
+        if ($layout) {
+            $_inner_ = $file;
+            include $layout;
+        } else {
+            include $file;
+        }
     }
 
 }
