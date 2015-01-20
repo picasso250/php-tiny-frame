@@ -40,6 +40,7 @@ function echo_json($data, $msg = '')
     } else {
         $json = ['code' => 0, 'data' => $data, 'message' => $msg ?: 'OK'];
     }
+    header('Content-type: application/javascript');
     echo json_encode($json);
 }
 
@@ -68,6 +69,7 @@ function run($rules, $page404 = null)
         }
     }
     if ($page404) {
+        header('HTTP/1.1 404 Not Found');
         return $page404();
     }
 }
