@@ -1,55 +1,60 @@
 php-tiny-frame
 ==============
 
-Small framework for website write in PHP.
+Very small framework for website write in PHP.
 
-一个简单的 PHP 路由框架，完全在一个文件内完成。
+## System Requirements
 
-简明教程
---------------
+PHP >= 5.4
 
-首先，配置路由。在 `index.php` 中配置路由，使用 rules 字段。调用 `run()` 方法运行程序, 参数是路由规则。
+## Hello World Tutorial
 
 ```php
 require 'php-tiny-fram/ptf/autoload.php';
-run([
+
+$routers = [
     ['GET', '%^/$%', function () {
         echo 'hello';
     }],
-]);
+];
+run($routers);
 ```
 
-每条路由规则由四个基本元素构成：
+## Routers
 
-1. 请求方法（如果传 null 则匹配所有）
-2. 网址规则（一个正则表达式，可以使用具名分组）
-3. 回调函数
-4. 预绑定事件
-
-如果没有找到对应的路由规则，则映射到run的第二个函数(如果有的话);
-
-简明教程
---------------
-
-以豆瓣小组为例，我们分析一下网址：
-
-`/group/topic/35708257/`
-
-当用户访问这个网址的时候，我们希望服务器执行我们写的特定代码。这个功能就叫做路由。在 ptf 中，你需要这样配置路由规则:
+You can pass the routers to `run()`.
 
 ```php
-['GET', '%^/group/topic/(?<id>\d+)$%', $func]
+function run($rules, $page404 = null)
 ```
 
-路由规则中的 `(?<id>\d+)` 代表参数，将会以关联数组的形式传递给回调函数.
+`$rules` is an array of rule. Each rule has 3 elements:
 
-### 404 页面
+1. http method
+2. url rule, using regex.
+3. a function to call when url matches
+4. (optional) event of before
 
-```
+If none of the rule matched, it will call the function `$page404`.
+
+```php
 run([
     ['GET', '%^/$%', $func],
 ], function() {
-	header()
-	echo '404 page';
+	echo '404 page'; // already send 404 header
 });
 ```
+
+All the callbacks of url rule recieve a prameter.
+
+`function callback($params)`
+
+which `$params` is an array, of 3rd parameter of the `preg_match()`.
+
+## Regex to match URL ##
+
+- You can use `%` instead of `/` as the deliminate as `/` is always used in the pattern.
+- Your use a named group such as `%^/topic/(?<topic_id>\d+)$%`, which You can recieve it in the `$params` as associate array of callback function.
+
+
+
