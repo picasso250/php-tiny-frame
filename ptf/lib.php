@@ -1,5 +1,18 @@
 <?php
 
+function _get($name, $default = null)
+{
+    return isset($_GET[$name]) ? $_GET[$name] : $default;
+}
+function _post($name, $default = null)
+{
+    return isset($_POST[$name]) ? $_POST[$name] : $default;
+}
+function _req($name, $default = null)
+{
+    return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $default;
+}
+
 function Service($name = null, $value = null)
 {
     static $container;
@@ -42,8 +55,8 @@ function run($rules, $page404 = null)
 
     $params = array();
     // 解析规则（阻断性）
-    foreach ($this->rules as $rule) {
-        if ($_SERVER['REQUEST_METHOD'] === $rule[0] && preg_match($rule[1], $url, $params)) {
+    foreach ($rules as $rule) {
+        if ($_SERVER['REQUEST_METHOD'] === $rule[0] && preg_match($rule[1], $uri, $params)) {
             if (isset($rule[3])) {
                 $before = $rule[3];
                 if ($before() === false) {
@@ -59,6 +72,11 @@ function run($rules, $page404 = null)
     }
 }
 
+function get_request_uri() {
+    $arr = explode('?', $_SERVER['REQUEST_URI']);
+    return $arr[0];
+}
+
 function render($file, $data = [], $layout = null)
 {
     extract($data);
@@ -69,3 +87,10 @@ function render($file, $data = [], $layout = null)
         include $file;
     }
 }
+
+function redirect($url)
+{
+    header("Location: $url");
+}
+
+
