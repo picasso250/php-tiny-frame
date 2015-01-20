@@ -6,7 +6,7 @@ Very small framework for website write in PHP.
 ## System Requirements
 
 * PHP >= 5.4
-* URL rewriting so that all requests are handled by index.php, you can just do `php -S 0.0.0.0:80`
+* URL rewriting so that all requests are handled by `index.php`, you can just `php -S 0.0.0.0:80`
 
 ## Example
 
@@ -76,12 +76,12 @@ which `$params` is an array, of 3rd parameter of the `preg_match()`.
 
 ## Regex to match URL ##
 
-- You can use `%` instead of `/` as the deliminate as `/` is always used in the pattern.
-- Your use a named group such as `%^/topic/(?<topic_id>\d+)$%`, which You can recieve it in the `$params` as associate array of callback function.
+- You can use `%` instead of `/` as the deliminator as `/` is always in pattern.
+- Your use a named group such as `%^/topic/(?<topic_id>\d+)$%`, which You can recieve it as association array of callback function.
 
-## services ##
+## Services ##
 
-register a service
+Register a service:
 
 ```php
 Service('db', new Pdo('mysql:dbname=xc', 'root', ''));
@@ -91,7 +91,7 @@ Service('db', new Pdo('mysql:dbname=xc', 'root', ''));
 $db = Service('db');
 ```
 
-## events ##
+## Events ##
 
 Every rule has 4th element to specify before event.
 
@@ -111,7 +111,7 @@ run([
 render('index.html', ['data' => $data]);
 ```
 
-or render with the layout
+Or render with the layout
 
 ```php
 render('index.html', ['data' => $data], 'layout.html');
@@ -130,7 +130,7 @@ where layout.html can render index.html as `$_inner_`.
 
 (MIT License)
 
-Copyright (c) 2010 Chris O'Hara cohara87@gmail.com
+Copyright (c) 2015 wangxiaochi cumt.xiaochi@gmail.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
