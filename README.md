@@ -91,6 +91,26 @@ Service('db', new Pdo('mysql:dbname=xc', 'root', ''));
 $db = Service('db');
 ```
 
+## Database ##
+
+query data
+
+```php
+Service('db')->queryAll('select * from topic where id > ?', [3]);
+```
+
+insert
+
+```php
+$id = Service('db')->insert('topic', ['title' => 'bar', 'body' => 'foo']);
+```
+
+update
+
+```php
+Service('db')->update('topic', ['title' => 'bar', 'body' => 'foo'], ['id' => 3]);
+```
+
 ## Events ##
 
 Every rule has 4th element to specify before event.
