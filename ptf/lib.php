@@ -44,6 +44,17 @@ function echo_json($data, $msg = '')
     echo json_encode($json);
 }
 
+function json($data, $msg = '')
+{
+    if (is_int($data)) {
+        $json = ['code' => $data, 'message' => $msg];
+    } else {
+        $json = ['code' => 0, 'data' => $data, 'message' => $msg ?: 'OK'];
+    }
+    header('Content-type: application/javascript');
+    return json_encode($json);
+}
+
 /**
  * 运行框架
  * ['GET', '%^get/(\d+)$%', function, before]
