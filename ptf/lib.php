@@ -33,17 +33,6 @@ function try_json_decode($str)
     return $obj;
 }
 
-function echo_json($data, $msg = '')
-{
-    if (is_int($data)) {
-        $json = ['code' => $data, 'message' => $msg];
-    } else {
-        $json = ['code' => 0, 'data' => $data, 'message' => $msg ?: 'OK'];
-    }
-    header('Content-type: application/javascript');
-    echo json_encode($json);
-}
-
 function json($data, $msg = '')
 {
     if (is_int($data)) {
@@ -106,4 +95,15 @@ function redirect($url)
     header("Location: $url");
 }
 
-
+function load_config()
+{
+    $arr = func_get_args();
+    $data = [];
+    foreach ($arr as $file) {
+        $data = array_merge(
+            $data,
+            try_json_decode(file_get_contents($file))
+        );
+    }
+    return $data;
+}
