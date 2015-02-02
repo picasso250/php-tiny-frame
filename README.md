@@ -38,7 +38,7 @@ echo json
 ```php
 $routers = [
     ['GET', '%^/api/v2/post/$%', function ($params) {
-        echo_json([1, 2, 3]);
+        echo json([1, 2, 3]);
     }],
 ];
 ```
